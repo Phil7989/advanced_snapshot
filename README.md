@@ -30,7 +30,6 @@ Add the following configuration to your `configuration.yaml` file:
 ```yaml
 # Advanced Snapshot Configuration
 advanced_snapshot:
-  # Optional: Add custom settings if needed
 ```
 
 Alternatively, you can configure the service via the Home Assistant UI under **Configuration** > **Integrations**.
