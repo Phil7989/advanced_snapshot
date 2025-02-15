@@ -82,11 +82,13 @@ service: advanced_snapshot.take_snapshot
 data:
   camera_entity_id: camera.front_door
   file_path: /config/www/front_door_snapshot.jpg
-  file_path_backup: /config/www/front_door_snapshot_backup.jpg
+  file_path_backup: >-
+    /config/www/backupsnapshots/{{ now().strftime('%y%m%d')}}_{{
+    now().strftime('%H%M%S')}}_frontdoot.jpg
   crop: [50, 50, 800, 600]
   add_bar: true
   custom_text_left: "Front Door"
-  custom_text_middle: "Snapshot"
+  custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
   custom_text_right: "{{ now() }}"
   setting_font_size: 18
   setting_font_color: "white"
