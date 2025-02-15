@@ -1,10 +1,10 @@
 
-# Advanced Snapshot for Home Assistant
+# 📸 Advanced Snapshot for Home Assistant
 
 ![Advanced Snapshot Icon](https://img.icons8.com/ios/452/camera.png)  
 **Advanced Snapshot** ist eine benutzerdefinierte Integration für [Home Assistant](https://www.home-assistant.io/), die es ermöglicht, automatisch Schnappschüsse von Kameras zu erstellen und diese mit benutzerdefinierten Texten und Optionen zu versehen. Diese Integration bietet zusätzliche Flexibilität und Anpassbarkeit für Kamerabilder, die in Home Assistant verwendet werden.
 
-## Features
+## 🚀 Features
 
 - **Capture snapshots** from any camera in your Home Assistant setup.
 - **Add custom text** to the snapshots, with options for left, center, and right-aligned text.
@@ -12,7 +12,7 @@
 - **Crop images** before saving them.
 - **Save snapshots** to a specified path and optionally create backups.
 
-## Installation
+## 🔧 Installation
 
 ### Prerequisites
 
@@ -36,7 +36,7 @@ advanced_snapshot:
 
 Alternatively, you can configure the service via the Home Assistant UI under **Configuration** > **Integrations**.
 
-## Usage
+## 🔧 Usage
 
 After installation, you can use the `advanced_snapshot` service to take snapshots from your camera entities. To call the service, use the following YAML:
 
@@ -74,7 +74,7 @@ data:
 - **setting_bar_color** (Optional): Color of the bar (default is `white`).
 - **setting_bar_position** (Optional): Position of the bar (`top` or `bottom`).
 
-## Example
+## 🎨 Example
 
 Here's an example of using the integration to capture a snapshot from your camera with a custom bar and text:
 
@@ -96,7 +96,7 @@ data:
   setting_bar_position: "top"
 ```
 
-## Troubleshooting
+## 💡 Troubleshooting
 
 If the service does not work as expected, please ensure the following:
 
@@ -109,7 +109,7 @@ If the service does not work as expected, please ensure the following:
 
 If you find a bug or would like to contribute new features, please fork the repository and submit a pull request. Contributions are always welcome!
 
-## Donate
+## 🙏 Donate
 
 If you find this integration useful and want to support its development, feel free to make a donation:
 
