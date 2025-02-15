@@ -113,7 +113,7 @@ If you find a bug or would like to contribute new features, please fork the repo
 
 If you find this integration useful and want to support its development, feel free to make a donation:
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](paypal.me/PhilippArnold89)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://paypal.me/PhilippArnold89)
 
 Your support is greatly appreciated!
 
