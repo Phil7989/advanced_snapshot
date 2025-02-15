@@ -1,0 +1,113 @@
+take_snapshot:
+  name: "Take Camera Snapshot"
+  description: "Takes a snapshot from the specified camera, crops it, and saves it with optional text."
+  fields:
+    camera_entity_id:
+      description: "The camera entity from which the snapshot should be taken."
+      example: "camera.cam_gewaechshaus_schnappschusse_klar"
+      required: true
+      selector:
+        entity:
+          domain: camera
+    file_path:
+      name: "Save Path"
+      description: "Path where the image should be saved."
+      required: true
+      example: "/config/www/push/snapshot.jpg"
+      selector:
+        text:
+    file_path_backup:
+      name: "Backup Save Path"
+      description: "Path where the backup of the image should be saved."
+      required: true
+      example: /config/www/backupsnapshots/{{ now().strftime("%y%m%d")}}_{{ now().strftime("%H%M%S")}}_snapshot.jpg
+      selector:
+        text:
+    crop:
+      description: "Optional crop as a list [x, y, width, height]."
+      example: "[500, 100, 1066, 600]"
+      required: false
+      selector:
+        object:
+    add_bar:
+      name: "Add Text Bar"
+      description: "Adds a white bar with text to the bottom of the image."
+      required: false
+      example: true
+      selector:
+        boolean:
+    custom_text_left:
+      name: "Custom Text Left"
+      description: "Text that should appear on the left side of the text bar."
+      required: false
+      example: "Greenhouse"
+      selector:
+        text:
+    custom_text_middle:
+      name: "Custom Text Middle"
+      description: "Text that should appear in the center of the text bar (e.g. an entity value)."
+      required: false
+      example: "{{ states('sensor.garten_actual_temperature') }} °C"
+      selector:
+        text:
+    custom_text_right:
+      name: "Custom Text Right"
+      description: "Text that should appear on the right side of the text bar (e.g. a timestamp)."
+      required: false
+      example: "{{ now().strftime('%d.%m.%y %H:%M:%S') }}"
+      selector:
+        text:
+    settings:
+      collaps: false
+      fields:
+        setting_font_path:
+          description: "Path to the font."
+          example: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
+          required: false
+          default: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
+          selector:
+            text:
+        setting_font_size:
+          description: "Font size for the text bar."
+          example: 20
+          required: false
+          default: 20
+          selector:
+            number:
+              min: 1
+              max: 50
+              step: 2
+        setting_font_color:
+          description: "Font color for the text bar."
+          example: "black"
+          required: false
+          default: "black"
+          selector:
+            text:
+        setting_bar_height:
+          description: "Height of the bar beneath the image."
+          example: 40
+          required: false
+          default: 40
+          selector:
+            number:
+              min: 10
+              max: 100
+              step: 5
+        setting_bar_color:
+          description: "Color of the text bar."
+          example: "white"
+          required: false
+          default: "white"
+          selector:
+            text:
+        setting_bar_position:
+          description: "Position of the text bar (top or bottom)."
+          example: "bottom"
+          required: false
+          default: "bottom"
+          selector:
+            select:
+              options:
+                - "top"
+                - "bottom"
