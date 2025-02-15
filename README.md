@@ -42,14 +42,16 @@ After installation, you can use the `advanced_snapshot` service to take snapshot
 ```yaml
 service: advanced_snapshot.take_snapshot
 data:
-  camera_entity_id: camera.your_camera
-  file_path: /config/www/snapshot.jpg
-  file_path_backup: /config/www/snapshot_backup.jpg
+  camera_entity_id: camera.your_camera_front_door
+  file_path: /config/www/frontdoor.jpg
+  file_path_backup: >-
+    /config/www/backupsnapshots/{{ now().strftime('%y%m%d')}}_{{
+    now().strftime('%H%M%S')}}_frontdoot.jpg
   crop: [100, 100, 400, 300]  # (x, y, width, height)
   add_bar: true
-  custom_text_left: "Left Text"
-  custom_text_middle: "Center Text"
-  custom_text_right: "Right Text"
+  custom_text_left: "Front Door"
+  custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
+  custom_text_right: "{{ now().strftime('%d.%m.%y %H:%M:%S') }}"
   setting_font_path: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
   setting_font_size: 20
   setting_font_color: "black"
@@ -72,30 +74,6 @@ data:
 - **setting_bar_height** (Optional): Height of the bar (default is 40).
 - **setting_bar_color** (Optional): Color of the bar (default is `white`).
 - **setting_bar_position** (Optional): Position of the bar (`top` or `bottom`).
-
-## 🎨 Example
-
-Here's an example of using the integration to capture a snapshot from your camera with a custom bar and text:
-
-```yaml
-service: advanced_snapshot.take_snapshot
-data:
-  camera_entity_id: camera.front_door
-  file_path: /config/www/front_door_snapshot.jpg
-  file_path_backup: >-
-    /config/www/backupsnapshots/{{ now().strftime('%y%m%d')}}_{{
-    now().strftime('%H%M%S')}}_frontdoot.jpg
-  crop: [50, 50, 800, 600]
-  add_bar: true
-  custom_text_left: "Front Door"
-  custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
-  custom_text_right: "{{ now() }}"
-  setting_font_size: 18
-  setting_font_color: "white"
-  setting_bar_height: 50
-  setting_bar_color: "blue"
-  setting_bar_position: "top"
-```
 
 ## 💡 Troubleshooting
 
