@@ -1,107 +1,136 @@
-import logging
 import os
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.camera import async_get_image
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
-from datetime import datetime
-
-_LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "advanced_snapshot"
 
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
     vol.Required("file_path"): cv.string,
-    vol.Optional("crop_x", default=0): vol.Coerce(int),
-    vol.Optional("crop_y", default=0): vol.Coerce(int),
-    vol.Optional("crop_width", default=0): vol.Coerce(int),
-    vol.Optional("crop_height", default=0): vol.Coerce(int),
+    vol.Optional("file_path_backup"): cv.string,
+    vol.Optional("crop", default=None): vol.Any(None, [vol.Coerce(int)]),
     vol.Optional("add_bar", default=False): cv.boolean,
     vol.Optional("custom_text_left", default=""): cv.string,
+    vol.Optional("custom_text_middle", default=""): cv.string,
     vol.Optional("custom_text_right", default=""): cv.string,
+    vol.Optional("setting_font_path", default="/config/custom_components/advanced_snapshot/Arial Bold.ttf"): cv.string,
+    vol.Optional("setting_font_size", default=20): vol.Coerce(int),
+    vol.Optional("setting_font_color", default="black"): cv.string,
+    vol.Optional("setting_bar_height", default=40): vol.Coerce(int),
+    vol.Optional("setting_bar_color", default="white"): cv.string,
+    vol.Optional("setting_bar_position", default="bottom"): cv.string
 })
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up Advanced Snapshot integration."""
-
-    async def handle_take_snapshot(call: ServiceCall):
-        """Handle the service call to take a snapshot."""
+    async def handle_take_snapshot(call: ServiceCall) -> ServiceResponse:
         camera_entity_id = call.data["camera_entity_id"]
         file_path = call.data["file_path"]
-        crop_x = call.data.get("crop_x", 0)
-        crop_y = call.data.get("crop_y", 0)
-        crop_width = call.data.get("crop_width", 0)
-        crop_height = call.data.get("crop_height", 0)
+        file_path_backup = call.data.get("file_path_backup")
+        crop = call.data.get("crop")
         add_bar = call.data.get("add_bar", False)
-        custom_text = call.data.get("custom_text", "")
+        custom_text_left = call.data.get("custom_text_left", "")
+        custom_text_middle = call.data.get("custom_text_middle", "")
+        custom_text_right = call.data.get("custom_text_right", "")
+        setting_font_size = call.data.get("setting_font_size", 20)
+        setting_font_path = call.data.get("setting_font_path", "/config/custom_components/advanced_snapshot/Arial Bold.ttf")
+        setting_bar_height = call.data.get("setting_bar_height", 40)
+        setting_bar_color = call.data.get("setting_bar_color", "white")
+        setting_bar_position = call.data.get("setting_bar_position", "bottom")
 
-        _LOGGER.info("Snapshot von %s wird aufgenommen und unter %s gespeichert", camera_entity_id, file_path)
+        event_data = {
+            "success": False,
+            "file_path": file_path,
+            "backup_path": file_path_backup,
+            "original_resolution": None,
+            "final_resolution": None,
+            "error": None
+        }
 
-        # Kamera-Bild abrufen
         try:
             image = await async_get_image(hass, camera_entity_id)
             if image is None or not hasattr(image, "content"):
-                _LOGGER.error("Fehler: Bild konnte nicht abgerufen werden")
-                return
+                event_data["error"] = "Image could not be retrieved"
+                return event_data
 
-            image_bytes = image.content
+            img = Image.open(BytesIO(image.content))
+            event_data["original_resolution"] = [img.width, img.height]
 
-        except Exception as e:
-            _LOGGER.error("Fehler beim Abrufen des Bildes: %s", e)
-            return
+            if crop and len(crop) == 4:
+                x, y, w, h = crop
+                if x < 0 or y < 0 or w <= 0 or h <= 0 or (x + w) > img.width or (y + h) > img.height:
+                    event_data["error"] = "Invalid crop values"
+                    return event_data
+                img = img.crop((x, y, x + w, y + h))
 
-        try:
-            img = Image.open(BytesIO(image_bytes))
-
-            # Falls Crop-Werte gesetzt sind, Bild zuschneiden
-            if crop_width > 0 and crop_height > 0:
-                img = img.crop((crop_x, crop_y, crop_x + crop_width, crop_y + crop_height))
-
-            # Falls Balken aktiviert ist, Text hinzufügen
             if add_bar:
-                img = add_text_bar(img, custom_text_left, custom_text_right)
+                img = add_text_bar(
+                    img, custom_text_left, custom_text_middle, custom_text_right,
+                    setting_font_path, setting_font_size, "black",
+                    setting_bar_height, setting_bar_color, setting_bar_position
+                )
 
-            # Sicherstellen, dass der Speicherpfad existiert
+            event_data["final_resolution"] = [img.width, img.height]
+
+            if not file_path.lower().endswith((".png", ".jpg", ".jpeg")):
+                event_data["error"] = "Invalid file format for the image"
+                return event_data
+
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-            # Bild speichern
             img.save(file_path)
-            _LOGGER.info("Snapshot erfolgreich gespeichert: %s", file_path)
+
+            if file_path_backup:
+                try:
+                    os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
+                    img.save(file_path_backup)
+                    event_data["backup_path"] = file_path_backup
+                except Exception as e:
+                    event_data["error"] = f"Backup failed: {str(e)}"
+                    event_data["success"] = False  
+
+            event_data["success"] = True
 
         except Exception as e:
-            _LOGGER.error("Fehler beim Verarbeiten oder Speichern des Bildes: %s", e)
+            event_data["error"] = str(e)
 
-    # Dienst registrieren
-    hass.services.async_register(DOMAIN, "take_snapshot", handle_take_snapshot, schema=SERVICE_SCHEMA)
+        return event_data
 
-    _LOGGER.info("AdvancedSnapshot Integration erfolgreich eingerichtet")
+    hass.services.async_register(
+        DOMAIN, "take_snapshot", handle_take_snapshot,
+        schema=SERVICE_SCHEMA, supports_response=SupportsResponse.OPTIONAL
+    )
     return True
 
-def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_right: str) -> Image.Image:
-    """Fügt einen weißen Balken mit Zeitstempel & Namen unter das Bild hinzu."""
+def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: str,
+                 custom_text_right: str, setting_font_path: str, setting_font_size: int,
+                 setting_font_color: str, setting_bar_height: int,
+                 setting_bar_color: str, setting_bar_position: str) -> Image.Image:
     width, height = img.size
-    bar_height = 50  # Höhe des Balkens
+    bar_height = setting_bar_height
 
-    # Neues Bild mit Platz für den Balken
-    new_img = Image.new("RGB", (width, height + bar_height), "white")
-    new_img.paste(img, (0, 0))
+    if setting_bar_position == "top":
+        new_img = Image.new("RGB", (width, height + bar_height), setting_bar_color)
+        new_img.paste(img, (0, bar_height))
+        text_y = (bar_height - setting_font_size) // 2
+    else:
+        new_img = Image.new("RGB", (width, height + bar_height), setting_bar_color)
+        new_img.paste(img, (0, 0))
+        text_y = height + (bar_height - setting_font_size) // 2
 
     draw = ImageDraw.Draw(new_img)
+    try:
+        font = ImageFont.truetype(setting_font_path, setting_font_size)
+    except IOError:
+        font = ImageFont.load_default()
 
-    # Standard-Schriftart verwenden (falls keine TTF verfügbar ist)
-    font = ImageFont.load_default()
-
-    # Text für den Balken
-    text = f"{custom_text_right} | {custom_text_left}" if custom_text else timestamp
-
-    # Text mittig positionieren
-    text_x = 10
-    text_y = height + (bar_height // 4)
-
-    draw.text((text_x, text_y), text, fill="black", font=font)
+    draw.text((10, text_y), custom_text_left, fill=setting_font_color, font=font)
+    draw.text(((width - draw.textlength(custom_text_middle, font=font)) // 2, text_y),
+              custom_text_middle, fill=setting_font_color, font=font)
+    draw.text((width - draw.textlength(custom_text_right, font=font) - 10, text_y),
+              custom_text_right, fill=setting_font_color, font=font)
 
     return new_img
