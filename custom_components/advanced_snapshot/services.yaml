@@ -62,9 +62,9 @@ take_snapshot:
       fields:
         setting_font_path:
           description: "Path to the font."
-          example: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
+          example: "/config/custom_components/advanced_snapshot/Arial.ttf"
           required: false
-          default: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
+          default: "/config/custom_components/advanced_snapshot/Arial.ttf"
           selector:
             text:
         setting_font_size:
