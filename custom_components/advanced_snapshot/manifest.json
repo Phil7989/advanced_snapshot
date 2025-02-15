@@ -5,5 +5,6 @@
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "requirements": ["Pillow"],
   "dependencies": ["camera"],
-  "codeowners": ["@Phil7989"]
+  "codeowners": ["@Phil7989"],
+  "icon": "mdi:camera"
 }
