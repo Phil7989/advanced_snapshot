@@ -51,7 +51,7 @@ data:
   custom_text_left: "Front Door"
   custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
   custom_text_right: "{{ now().strftime('%d.%m.%y %H:%M:%S') }}"
-  setting_font_path: "/config/custom_components/advanced_snapshot/Arial Bold.ttf"
+  setting_font_path: "/config/custom_components/advanced_snapshot/Arial.ttf"
   setting_font_size: 20
   setting_font_color: "black"
   setting_bar_height: 40
