@@ -45,7 +45,7 @@ data:
   file_path: /config/www/frontdoor.jpg
   file_path_backup: >-
     /config/www/backupsnapshots/{{ now().strftime('%y%m%d')}}_{{
-    now().strftime('%H%M%S')}}_frontdoot.jpg
+    now().strftime('%H%M%S')}}_frontdoor.jpg
   crop: [100, 100, 400, 300]  # (x, y, width, height)
   add_bar: true
   custom_text_left: "Front Door"
