@@ -6,5 +6,5 @@
   "requirements": ["Pillow"],
   "dependencies": ["camera"],
   "codeowners": ["@Phil7989"],
-  "icon": "mdi:camera"
+  "icon": "/local/community/advanced_snapshot/icon/photo-camera.svg"
 }
