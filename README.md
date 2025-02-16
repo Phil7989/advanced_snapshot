@@ -1,4 +1,3 @@
-
 # 📸 Advanced Snapshot for Home Assistant
 
 **Advanced Snapshot** is a custom integration for [Home Assistant](https://www.home-assistant.io/) that allows you to automatically capture snapshots from cameras and customize them with personalized texts and options. This integration provides additional flexibility and customization for camera images used in Home Assistant.
@@ -67,7 +66,7 @@ data:
 - **crop** (Optional): List with four integers `[x, y, width, height]` to crop the image. If not provided, the full image will be used.
 - **add_bar** (Optional): If set to `true`, a text bar will be added to the snapshot.
 - **custom_text_left**, **custom_text_middle**, **custom_text_right** (Optional): Texts to be displayed on the left, center, and right of the bar.
-- **setting_font_path** (Optional): Path to the font file (defaults to `/config/custom_components/advanced_snapshot/Arial Bold.ttf`).
+- **setting_font_path** (Optional): Path to the font file (defaults to `/config/custom_components/advanced_snapshot/Arial.ttf`).
 - **setting_font_size** (Optional): Font size for the text (default is 20).
 - **setting_font_color** (Optional): Color of the text (default is `black`).
 - **setting_bar_height** (Optional): Height of the bar (default is 40).
