@@ -75,7 +75,18 @@ data:
 
 ### Response
 
-
+```
+success: true
+file_path: /config/www/push/snapshot.jpg
+backup_path: /config/www/backupsnapshots/250216_220954_snapshot.jpg
+original_resolution:
+  - 3840
+  - 2160
+final_resolution:
+  - 1066
+  - 640
+error: null
+```
 
 ## 💡 Troubleshooting
 
