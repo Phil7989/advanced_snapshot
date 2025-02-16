@@ -73,6 +73,10 @@ data:
 - **setting_bar_color** (Optional): Color of the bar (default is `white`).
 - **setting_bar_position** (Optional): Position of the bar (`top` or `bottom`).
 
+### Response
+
+
+
 ## 💡 Troubleshooting
 
 If the service does not work as expected, please ensure the following:
