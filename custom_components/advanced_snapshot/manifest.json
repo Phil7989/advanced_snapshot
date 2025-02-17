@@ -5,6 +5,5 @@
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "requirements": ["Pillow"],
   "dependencies": ["camera"],
-  "codeowners": ["@Phil7989"],
-  "icon": "/local/community/advanced_snapshot/icon/photo-camera.svg"
+  "codeowners": ["@Phil7989"]
 }
