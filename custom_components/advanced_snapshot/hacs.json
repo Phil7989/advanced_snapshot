@@ -1,0 +1,11 @@
+{
+  "name": "Advanced Snapshot",
+  "description": "Erweiterte Snapshot-Funktion für Home Assistant.",
+  "country": "DE",
+  "domains": ["camera"],
+  "homeassistant": "2023.1.0",
+  "render_readme": true,
+  "zip_release": false,
+  "filename": "custom_components/advanced_snapshot",
+  "image": "https://raw.githubusercontent.com/Phil7989/advanced_snapshot/main/icon/photo-camera.svg"
+}
