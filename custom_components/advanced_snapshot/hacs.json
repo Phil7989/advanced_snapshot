@@ -6,6 +6,5 @@
   "homeassistant": "2023.1.0",
   "render_readme": true,
   "zip_release": false,
-  "filename": "custom_components/advanced_snapshot",
-  "image": "https://github.com/Phil7989/advanced_snapshot/blob/main/custom_components/advanced_snapshot/icon/photo-camera.svg"
+  "filename": "custom_components/advanced_snapshot"
 }
