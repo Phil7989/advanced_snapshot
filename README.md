@@ -2,7 +2,7 @@
 
 **Advanced Snapshot** is a custom integration for [Home Assistant](https://www.home-assistant.io/) that allows you to automatically capture snapshots from cameras and customize them with personalized texts and options. This integration provides additional flexibility and customization for camera images used in Home Assistant.
 
-| ![Bild 1](custom_components/advanced_snapshot/images/original.jpg) | ![Bild 2](custom_components/advanced_snapshot/images/advancedsnapshot.jpg) |
+| <img src="custom_components/advanced_snapshot/images/original.jpg" alt="Original Snapshot" width="500"> | <img src="custom_components/advanced_snapshot/images/advancedsnapshot.jpg" alt="Advanced Snapshot" width="500"> |
 |-----------------------------|-----------------------------|
 | Original Snapshot           | Advanced Snapshot           |
 
