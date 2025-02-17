@@ -2,6 +2,7 @@
   "domain": "advanced_snapshot",
   "name": "Advanced Snapshot",
   "version": "1.0.0",
+  "config_flow": true,
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "requirements": ["Pillow"],
   "dependencies": ["camera"],
