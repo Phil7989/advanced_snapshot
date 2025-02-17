@@ -8,7 +8,8 @@
     <figcaption>Original</figcaption>
   </figure>
   <figure style="display: inline-block; text-align: center;">
-    <img src="images/advancedsnapshot.jpg" width="300"/>
+    <img src="advanced_snapshot
+/custom_components/images/advancedsnapshot.jpg" width="300"/>
     <figcaption>Advanced Snapshot</figcaption>
   </figure>
 </div>
