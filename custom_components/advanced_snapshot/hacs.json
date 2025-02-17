@@ -7,5 +7,5 @@
   "render_readme": true,
   "zip_release": false,
   "filename": "custom_components/advanced_snapshot",
-  "image": "https://raw.githubusercontent.com/Phil7989/advanced_snapshot/main/icon/photo-camera.svg"
+  "image": "https://github.com/Phil7989/advanced_snapshot/blob/main/custom_components/advanced_snapshot/icon/photo-camera.svg"
 }
