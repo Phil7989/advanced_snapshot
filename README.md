@@ -1,5 +1,3 @@
-<a href="https://www.buymeacoffee.com/56xsp4m6sxy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
 # 📸 Advanced Snapshot for Home Assistant
 
 **Advanced Snapshot** is a custom integration for [Home Assistant](https://www.home-assistant.io/) that allows you to automatically capture snapshots from cameras and customize them with personalized texts and options. This integration provides additional flexibility and customization for camera images used in Home Assistant.
@@ -112,6 +110,7 @@ If you find a bug or would like to contribute new features, please fork the repo
 If you find this integration useful and want to support its development, feel free to make a donation:
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://paypal.me/PhilippArnold89)
+<a href='https://www.buymeacoffee.com/56xsp4m6sxy'><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" style="width:80px; height:auto;"></a>
 
 Your support is greatly appreciated!
 
