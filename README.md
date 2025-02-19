@@ -110,7 +110,7 @@ If you find a bug or would like to contribute new features, please fork the repo
 If you find this integration useful and want to support its development, feel free to make a donation:
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://paypal.me/PhilippArnold89)
-<a href='https://www.buymeacoffee.com/56xsp4m6sxy'><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" style="width:80px; height:auto;"></a>
+<a href='https://www.buymeacoffee.com/56xsp4m6sxy'><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" width="80" style="width:80px; height:auto;"></a>
 
 Your support is greatly appreciated!
 
