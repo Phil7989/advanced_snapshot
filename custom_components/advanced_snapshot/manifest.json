@@ -1,7 +1,7 @@
 {
   "domain": "advanced_snapshot",
   "name": "Advanced Snapshot",
-  "version": "1.0.0",
+  "version": "2025.3",
   "config_flow": true,
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "requirements": ["Pillow"],
