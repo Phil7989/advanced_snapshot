@@ -1,43 +1,53 @@
-import logging
-import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.helpers import config_validation as cv
+import voluptuous as vol
+from .const import DOMAIN, CONF_FONT_FOLDER, CONF_BACKUP_FOLDER, CONF_SNAPSHOT_FOLDER
 
-_LOGGER = logging.getLogger(__name__)
-
-# Einfaches Schema für die Eingaben ohne feste Werte
-DATA_SCHEMA = vol.Schema({
-    vol.Required("snapshots_directory"): str,
-    vol.Required("camera_entity"): cv.entity_id,
-})
-
-class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain="advanced_snapshot"):
-    """Handle a simple config flow for Advanced Snapshot."""
-    
-    VERSION = 1
-
-    def __init__(self):
-        """Initialize the flow."""
-        self.snapshots_directory = None
-        self.camera_entity = None
+class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for Advanced Snapshot."""
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
+        errors = {}
+
+        if self._is_entry_existing():
+            # Fehlermeldung ausgeben, aber kein Formular öffnen
+            return self.async_abort(reason="already_configured")
+
         if user_input is not None:
-            # Direkt die Eingabewerte speichern und den Flow abschließen
-            self.snapshots_directory = user_input["snapshots_directory"]
-            self.camera_entity = user_input["camera_entity"]
+            return self.async_create_entry(title="Advanced Snapshot", data=user_input)
 
-            # Speichern der Konfiguration ohne zusätzliche Validierung
-            return self.async_create_entry(
-                title="Advanced Snapshot",
-                data={
-                    "snapshots_directory": self.snapshots_directory,
-                    "camera_entity": self.camera_entity,
-                }
-            )
+        return self.async_show_form(step_id="user", data_schema=self._get_schema(), errors=errors)
 
-        # Wenn keine Eingaben vorhanden sind, wird das Formular angezeigt
-        return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA
-        )
+    def _is_entry_existing(self):
+        existing_entries = self.hass.config_entries.async_entries(DOMAIN)
+        return len(existing_entries) > 0
+
+    def _get_schema(self):
+        return vol.Schema({
+            vol.Required(CONF_FONT_FOLDER, default="/config/fonts"): str,
+            vol.Required(CONF_BACKUP_FOLDER, default="/config/backups"): str,
+            vol.Required(CONF_SNAPSHOT_FOLDER, default="/config/snapshots"): str,
+        })
+
+    @staticmethod
+    @config_entries.HANDLERS.register(DOMAIN)
+    def async_get_options_flow(config_entry):
+        """Return the options flow handler."""
+        return AdvancedSnapshotOptionsFlowHandler(config_entry)
+
+class AdvancedSnapshotOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle options flow for Advanced Snapshot."""
+
+    async def async_step_init(self, user_input=None):
+        """Manage the options for the integration."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        # Hier auf config_entry direkt zugreifen
+        schema = vol.Schema({
+            vol.Required(CONF_FONT_FOLDER, default=self.config_entry.options.get(CONF_FONT_FOLDER, "/config/fonts")): str,
+            vol.Required(CONF_BACKUP_FOLDER, default=self.config_entry.options.get(CONF_BACKUP_FOLDER, "/config/backups")): str,
+            vol.Required(CONF_SNAPSHOT_FOLDER, default=self.config_entry.options.get(CONF_SNAPSHOT_FOLDER, "/config/snapshots")): str,
+        })
+
+        return self.async_show_form(step_id="init", data_schema=schema)
