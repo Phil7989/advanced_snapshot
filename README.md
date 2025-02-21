@@ -14,28 +14,21 @@
 - **Crop images** before saving them.
 - **Save snapshots** to a specified path and optionally create backups.
 
-## 🔧 Installation
+## 🔧 Installation - Using HACS
 
-### Prerequisites
+This integration is NO official HACS Integration right now.
 
-Ensure you have a working Home Assistant setup and that you have the necessary permissions to install custom integrations.
+Open HACS then install the "advanced_snapshot" integration or use the link below.
 
-1. Download the custom integration folder.
-2. Place the folder in your Home Assistant configuration directory:  
-   `config/custom_components/advanced_snapshot/`
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Phil7989&repository=advanced_snapshot&category=integration)
 
-3. Restart Home Assistant.
+If you use this method, your component will always update to the latest version.
 
 ### Configuration
 
-Add the following configuration to your `configuration.yaml` file:
+Go to Configuration -> Integrations and click on "add integration". Then search for "advanced_snapshot".
 
-```yaml
-# Advanced Snapshot Configuration
-advanced_snapshot:
-```
-
-Alternatively, you can configure the service via the Home Assistant UI under **Configuration** > **Integrations**.
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=advanced_snapshot)
 
 ## 🔧 Usage
 
