@@ -54,7 +54,7 @@ take_snapshot:
       name: "Custom Text Right"
       description: "Text that should appear on the right side of the text bar (e.g. a timestamp)."
       required: false
-      example: "{{ now().strftime('%d.%m.%y %H:%M:%S') }}"
+      example: "\"{{ now().strftime('%d.%m.%y %H:%M:%S') }}\""
       selector:
         text:
     settings:
@@ -62,9 +62,9 @@ take_snapshot:
       fields:
         setting_font_path:
           description: "Path to the font."
-          example: "/config/custom_components/advanced_snapshot/Arial.ttf"
+          example: "/config/custom_components/advanced_snapshot/fonts/Arial.ttf"
           required: false
-          default: "/config/custom_components/advanced_snapshot/Arial.ttf"
+          default: "/config/custom_components/advanced_snapshot/fonts/Arial.ttf"
           selector:
             text:
         setting_font_size:
