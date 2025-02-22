@@ -1,0 +1,10 @@
+{
+  "domain": "advanced_snapshot",
+  "name": "Advanced Snapshot",
+  "version": "2025.3",
+  "config_flow": true,
+  "documentation": "https://github.com/Phil7989/advanced_snapshot",
+  "requirements": ["Pillow"],
+  "dependencies": ["camera"],
+  "codeowners": ["@Phil7989"]
+}

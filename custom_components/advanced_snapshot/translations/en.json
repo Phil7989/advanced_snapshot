@@ -1,0 +1,31 @@
+{
+  "title": "Advanced Snapshot",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Setup Advanced Snapshot",
+        "description": "Configure the snapshot and backup directories.",
+        "data": {
+          "font_folder": "Font Folder",
+          "backup_folder": "Backup Folder",
+          "snapshot_folder": "Snapshot Folder"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This integration is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Edit Advanced Snapshot Settings",
+        "data": {
+          "font_folder": "Font Folder",
+          "backup_folder": "Backup Folder",
+          "snapshot_folder": "Snapshot Folder"
+        }
+      }
+    }
+  }
+}

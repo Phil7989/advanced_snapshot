@@ -1,0 +1,31 @@
+{
+    "title": "Advanced Snapshot",
+    "config": {
+        "step": {
+            "user": {
+            "title": "Einrichtung von Advanced Snapshot",
+            "description": "Konfiguriere die Verzeichnisse für Snapshots und Backups.",
+            "data": {
+              "font_folder": "Schriftarten-Ordner",
+              "backup_folder": "Backup-Ordner",
+              "snapshot_folder": "Snapshot-Ordner"
+            }
+          }
+        },
+        "abort": {
+          "already_configured": "Diese Integration ist bereits konfiguriert."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+            "title": "Einstellungen für Advanced Snapshot bearbeiten",
+            "data": {
+                "font_folder": "Schriftarten-Ordner",
+                "backup_folder": "Backup-Ordner",
+                "snapshot_folder": "Snapshot-Ordner"
+                }
+            }
+        }
+    }
+}
