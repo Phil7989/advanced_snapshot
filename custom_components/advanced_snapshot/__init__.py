@@ -12,7 +12,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = "advanced_snapshot"
 
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
