@@ -7,7 +7,7 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.config_entries import OptionsFlow  
 
-from .const import DOMAINhhhh
+from .const import DOMAIN
 
 class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Advanced Snapshot."""
