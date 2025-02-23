@@ -13,7 +13,7 @@
       }
     },
     "abort": {
-      "already_configured": "Diese Integration ist bereits konfiguriert."
+      "already_configured": "Diese Integration ist befreits konfiguriert."
     }
   },
   "options": {
