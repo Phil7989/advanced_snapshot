@@ -1,1 +1,1 @@
-DOMAIN = "advanced_snkjnjnapshot"
+DOMAIN = "advanced_snapshot"
