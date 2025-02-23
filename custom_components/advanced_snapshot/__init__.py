@@ -12,7 +12,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
     vol.Required("file_path"): cv.string,

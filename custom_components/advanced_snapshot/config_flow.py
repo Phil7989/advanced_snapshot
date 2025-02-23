@@ -5,8 +5,9 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.config_entries import OptionsFlow  
 
-from .const import DOMAIN, CONF_FONT_FOLDER, CONF_BACKUP_FOLDER, CONF_SNAPSHOT_FOLDER
+from .const import DOMAIN
 
 class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Advanced Snapshot."""
@@ -16,7 +17,7 @@ class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if self._is_entry_existing():
-            return self.async_abort(reason="already_configured",description_placeholders={"message": "error_message"})
+            return self.async_abort(reason="already_configured")
 
         if user_input is not None:
             return self.async_create_entry(title=DOMAIN, data=user_input)
