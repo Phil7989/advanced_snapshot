@@ -2,6 +2,7 @@ import os
 import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+import aiofiles
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
@@ -11,6 +12,7 @@ from io import BytesIO
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
 
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
@@ -114,13 +116,15 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
             return event_data
 
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        img.save(file_path)
+        #img.save(file_path)
+        await async_save_image(img, file_path)
         _LOGGER.info(f"Snapshot saved at {file_path}")
 
         if file_path_backup:
             try:
                 os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
-                img.save(file_path_backup)
+                #img.save(file_path_backup)
+                await async_save_image(img, file_path_backup)
                 _LOGGER.info(f"Backup snapshot saved at {file_path_backup}")
                 event_data["backup_path"] = file_path_backup
             except Exception as e:
@@ -169,3 +173,27 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
               custom_text_right, fill=setting_font_color, font=font)
 
     return new_img
+
+async def async_save_image(img: Image.Image, file_path: str):
+    """Asynchronously saves a PIL image, automatically detecting the format from the file path."""
+    try:
+        # Detect the file format from the extension
+        ext = os.path.splitext(file_path)[1].lower()
+        format_map = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG"}
+        image_format = format_map.get(ext, "JPEG")  # Default to JPEG if unknown
+
+        # Save the image to a byte buffer
+        buffer = BytesIO()
+        img.save(buffer, format=image_format)
+        buffer.seek(0)
+
+        # Asynchronously write to file
+        async with aiofiles.open(file_path, "wb") as f:
+            await f.write(buffer.getvalue())
+
+        _LOGGER.info(f"Snapshot successfully saved: {file_path} ({image_format})")
+        return True
+    except Exception as e:
+        _LOGGER.error(f"Error saving {file_path}: {str(e)}")
+        return False
+

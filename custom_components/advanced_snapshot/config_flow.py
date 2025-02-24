@@ -42,21 +42,25 @@ class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Return the options flow handler."""
         return AdvancedSnapshotOptionsFlowHandler(config_entry)
         
-class AdvancedSnapshotOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options flow for Advanced Snapshot."""
-
+class AdvancedSnapshotOptionsFlowHandler(OptionsFlow):
     def __init__(self, config_entry):
         """Initialize options flow."""
-        self.config_entry = config_entry
+        self.entry_id = config_entry.entry_id  
 
     async def async_step_init(self, user_input=None):
-        """Manage the options for the integration."""
-        if user_input is not None:
-            self.hass.config_entries.async_update_entry(
-                self._config_entry, data=user_input
-            )
-            return self.async_create_entry(title=DOMAIN, data={})  # Keine Optionen speichern
+        """Manage the options."""
+        config_entry = self.hass.config_entries.async_get_entry(self.entry_id)  
 
+        if not config_entry:
+            return self.async_abort(reason="config_entry_not_found")
+
+        options = dict(config_entry.options)
+
+        if user_input is not None:
+            options.update(user_input)
+            self.hass.config_entries.async_update_entry(config_entry, options=options)
+            return self.async_create_entry(title=DOMAIN, data={})
+        
         data = self.config_entry.data
         
         schema = vol.Schema({
@@ -64,6 +68,5 @@ class AdvancedSnapshotOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required("snapshot_folder", default=data.get("snapshot_folder", "/config/www/backupsnapshots/")): str,
             vol.Required("backup_folder", default=data.get("backup_folder", "/config/www/snapshots/")): str,
         })
-
-        return self.async_show_form(step_id="init", data_schema=schema)
         
+        return self.async_show_form(step_id="init", data_schema=schema)
