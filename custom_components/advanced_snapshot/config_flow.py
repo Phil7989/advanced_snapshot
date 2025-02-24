@@ -54,11 +54,8 @@ class AdvancedSnapshotOptionsFlowHandler(OptionsFlow):
         if not config_entry:
             return self.async_abort(reason="config_entry_not_found")
 
-        options = dict(config_entry.options)
-
         if user_input is not None:
-            options.update(user_input)
-            self.hass.config_entries.async_update_entry(config_entry, options=options)
+            self.hass.config_entries.async_update_entry(config_entry, data={**config_entry.data, **user_input})
             return self.async_create_entry(title=DOMAIN, data={})
         
         data = self.config_entry.data
