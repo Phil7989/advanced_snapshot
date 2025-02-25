@@ -61,6 +61,22 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
         camera_entity_id = call.data["camera_entity_id"]
         file_path = call.data["file_path"]
         file_path_backup = call.data.get("file_path_backup")
+        setting_font_path = call.data.get("setting_font_path")
+
+        snapshot_folder = hass.data.get(DOMAIN, {}).get("snapshot_folder")
+        backup_folder = hass.data.get(DOMAIN, {}).get("backup_folder")
+        font_folder = hass.data.get(DOMAIN, {}).get("font_folder")
+
+        if not os.path.isabs(file_path):
+            file_path = os.path.join(snapshot_folder, file_path)
+
+        if file_path_backup and not os.path.isabs(file_path_backup):
+            file_path_backup = os.path.join(backup_folder, file_path_backup)
+
+        if not os.path.isabs(setting_font_path):
+            setting_font_path = os.path.join(font_folder, setting_font_path)
+        if not os.path.splitext(setting_font_path)[1]:  
+            setting_font_path += ".ttf"
         crop = call.data.get("crop")
         crop_aspect_ratio = call.data.get("crop_aspect_ratio")
         add_bar = call.data.get("add_bar", False)
@@ -68,12 +84,9 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
         custom_text_middle = call.data.get("custom_text_middle", "")
         custom_text_right = call.data.get("custom_text_right", "")
         setting_font_size = call.data.get("setting_font_size", 20)
-        setting_font_path = call.data.get("setting_font_path", "/config/custom_components/advanced_snapshot/fonts/Arial.ttf")
         setting_bar_height = call.data.get("setting_bar_height", 40)
         setting_bar_color = call.data.get("setting_bar_color", "white")
         setting_bar_position = call.data.get("setting_bar_position", "bottom")
-
-        _LOGGER.debug(f"Snapshot parameters: {call.data}")
 
         event_data = {
             "success": False,
@@ -90,11 +103,14 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
             event_data["error"] = "Image could not be retrieved"
             return event_data
 
-        img = Image.open(BytesIO(image.content))
-        event_data["original_resolution"] = [img.width, img.height]
+        if crop:
+            if len(crop) < 3:
+                _LOGGER.error("Invalid crop values: crop must have at least [x, y, width]")
+                event_data["error"] = "Invalid crop values"
+                return event_data
 
-        if crop and len(crop) == 4:
-            x, y, w, h = crop
+            x, y, w = crop[:3]
+            h = crop[3] if len(crop) == 4 else None
 
             if crop_aspect_ratio:
                 try:
@@ -106,11 +122,23 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
                     event_data["error"] = "Invalid aspect ratio format"
                     return event_data
 
-            if x < 0 or y < 0 or w <= 0 or h <= 0 or (x + w) > img.width or (y + h) > img.height:
-                _LOGGER.error(f"Invalid crop values: {crop}")
-                event_data["error"] = "Invalid crop values"
+            if h is None:
+                _LOGGER.error("Height (h) is missing and no aspect ratio provided.")
+                event_data["error"] = "Height (h) is missing and no aspect ratio provided."
                 return event_data
 
+            if x < 0 or y < 0 or w <= 0 or h <= 0:
+                _LOGGER.error(f"Invalid crop dimensions: {x, y, w, h}")
+                event_data["error"] = "Invalid crop dimensions"
+                return event_data
+
+            img = Image.open(BytesIO(image.content))
+            event_data["original_resolution"] = [img.width, img.height]
+            if (x + w) > img.width or (y + h) > img.height:
+                _LOGGER.error(f"Invalid crop area: ({x}, {y}, {w}, {h}) exceeds image size")
+                event_data["error"] = "Invalid crop area"
+                return event_data
+            
             img = img.crop((x, y, x + w, y + h))
 
         if add_bar:
@@ -167,6 +195,7 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
         font = ImageFont.truetype(setting_font_path, setting_font_size)
     except IOError:
         _LOGGER.warning(f"Font file not found: {setting_font_path}, using default font.")
+        event_data["error"] = f"Font file not found: {setting_font_path}, using default font."
         font = ImageFont.load_default()
 
     draw.text((10, text_y), custom_text_left, fill=setting_font_color, font=font)

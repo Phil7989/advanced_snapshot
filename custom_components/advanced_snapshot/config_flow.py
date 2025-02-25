@@ -31,9 +31,9 @@ class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def _get_schema(self):
         return vol.Schema({
+            vol.Required("snapshot_folder", default="/config/www/snapshots/"): str,
+            vol.Required("backup_folder", default="/config/www/backupsnapshots/"): str,
             vol.Required("font_folder", default="/config/custom_components/advanced_snapshot/fonts"): str,
-            vol.Required("snapshot_folder", default="/config/www/backupsnapshots/"): str,
-            vol.Required("backup_folder", default="/config/www/snapshots/"): str,
         })
 
     @staticmethod
@@ -61,9 +61,9 @@ class AdvancedSnapshotOptionsFlowHandler(OptionsFlow):
         data = self.config_entry.data
         
         schema = vol.Schema({
+            vol.Required("snapshot_folder", default=data.get("snapshot_folder", "/config/www/snapshots/")): str,
+            vol.Required("backup_folder", default=data.get("backup_folder", "/config/www/backupsnapshots/")): str,
             vol.Required("font_folder", default=data.get("font_folder", "/config/custom_components/advanced_snapshot/fonts")): str,
-            vol.Required("snapshot_folder", default=data.get("snapshot_folder", "/config/www/backupsnapshots/")): str,
-            vol.Required("backup_folder", default=data.get("backup_folder", "/config/www/snapshots/")): str,
         })
         
         return self.async_show_form(step_id="init", data_schema=schema)
