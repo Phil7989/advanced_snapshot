@@ -31,7 +31,7 @@
   },
   "services": {
     "take_snapshot": {
-      "name": "Take Camera Snapshot",
+      "name": "save Snapshot",
       "description": "Takes a snapshot from the specified camera, crops it, and saves it with optional text.",
       "fields": {
         "camera_entity_id": {
@@ -48,7 +48,11 @@
         },
         "crop": {
           "name": "Crop",
-          "description": "Optional crop as a list [x, y, width, height]."
+          "description": "Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored."
+        },
+        "crop_aspect_ratio": {
+          "name": "Crop Aspect Ratio",
+          "description": "Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically."
         },
         "add_bar": {
           "name": "Add Text Bar",

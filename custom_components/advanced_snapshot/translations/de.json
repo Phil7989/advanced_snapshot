@@ -31,7 +31,7 @@
   },
   "services": {
     "take_snapshot": {
-      "name": "Kamera-Snapshot aufnehmen",
+      "name": "Snapshot speichern",
       "description": "Nimmt einen Snapshot von der angegebenen Kamera auf, schneidet ihn zu und speichert ihn mit optionalem Text.",
       "fields": {
         "camera_entity_id": {
@@ -48,7 +48,11 @@
         },
         "crop": {
           "name": "Zuschneiden",
-          "description": "Optionale Zuschneideliste [x, y, Breite, Höhe]."
+          "description": "Definiert den Zuschnittbereich als [x, y, Breite, Höhe]. Wenn ein Seitenverhältnis festgelegt ist, wird die Höhe ignoriert."
+        },
+        "crop_aspect_ratio": {
+          "name": "Zuschneideverhältnis",
+          "description": "Optionales Seitenverhältnis (z. B. '16:9'). Wenn festgelegt, wird die Höhe in 'crop' ignoriert und automatisch berechnet."
         },
         "add_bar": {
           "name": "Textleiste hinzufügen",

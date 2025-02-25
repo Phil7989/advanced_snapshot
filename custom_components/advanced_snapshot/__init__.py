@@ -13,12 +13,12 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
     vol.Required("file_path"): cv.string,
     vol.Optional("file_path_backup"): cv.string,
     vol.Optional("crop", default=None): vol.Any(None, [vol.Coerce(int)]),
+    vol.Optional("crop_aspect_ratio", default=None): vol.Any(None, vol.Match(r"^\d+:\d+$")),
     vol.Optional("add_bar", default=False): cv.boolean,
     vol.Optional("custom_text_left", default=""): cv.string,
     vol.Optional("custom_text_middle", default=""): cv.string,
@@ -62,6 +62,7 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
         file_path = call.data["file_path"]
         file_path_backup = call.data.get("file_path_backup")
         crop = call.data.get("crop")
+        crop_aspect_ratio = call.data.get("crop_aspect_ratio")
         add_bar = call.data.get("add_bar", False)
         custom_text_left = call.data.get("custom_text_left", "")
         custom_text_middle = call.data.get("custom_text_middle", "")
@@ -94,10 +95,22 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
 
         if crop and len(crop) == 4:
             x, y, w, h = crop
+
+            if crop_aspect_ratio:
+                try:
+                    aspect_w, aspect_h = map(int, crop_aspect_ratio.split(":"))
+                    h = int(w * (aspect_h / aspect_w))
+                    _LOGGER.info(f"Using aspect ratio {crop_aspect_ratio}, calculated height: {h}")
+                except ValueError:
+                    _LOGGER.error(f"Invalid aspect ratio format: {crop_aspect_ratio}")
+                    event_data["error"] = "Invalid aspect ratio format"
+                    return event_data
+
             if x < 0 or y < 0 or w <= 0 or h <= 0 or (x + w) > img.width or (y + h) > img.height:
                 _LOGGER.error(f"Invalid crop values: {crop}")
                 event_data["error"] = "Invalid crop values"
                 return event_data
+
             img = img.crop((x, y, x + w, y + h))
 
         if add_bar:
@@ -110,20 +123,13 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
 
         event_data["final_resolution"] = [img.width, img.height]
 
-        if not file_path.lower().endswith((".png", ".jpg", ".jpeg")):
-            _LOGGER.error(f"Invalid file format: {file_path}")
-            event_data["error"] = "Invalid file format for the image"
-            return event_data
-
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        #img.save(file_path)
         await async_save_image(img, file_path)
         _LOGGER.info(f"Snapshot saved at {file_path}")
 
         if file_path_backup:
             try:
                 os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
-                #img.save(file_path_backup)
                 await async_save_image(img, file_path_backup)
                 _LOGGER.info(f"Backup snapshot saved at {file_path_backup}")
                 event_data["backup_path"] = file_path_backup
@@ -160,10 +166,7 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
     try:
         font = ImageFont.truetype(setting_font_path, setting_font_size)
     except IOError:
-        error_msg = f"Font file not found: {setting_font_path}, using default font."
-        _LOGGER.warning(error_msg)
-        event_data["error"] = error_msg 
-        event_data["success"] = False  
+        _LOGGER.warning(f"Font file not found: {setting_font_path}, using default font.")
         font = ImageFont.load_default()
 
     draw.text((10, text_y), custom_text_left, fill=setting_font_color, font=font)
@@ -175,25 +178,14 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
     return new_img
 
 async def async_save_image(img: Image.Image, file_path: str):
-    """Asynchronously saves a PIL image, automatically detecting the format from the file path."""
-    try:
-        # Detect the file format from the extension
-        ext = os.path.splitext(file_path)[1].lower()
-        format_map = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG"}
-        image_format = format_map.get(ext, "JPEG")  # Default to JPEG if unknown
+    ext = os.path.splitext(file_path)[1].lower()
+    format_map = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG"}
+    image_format = format_map.get(ext, "JPEG")
 
-        # Save the image to a byte buffer
+    async with aiofiles.open(file_path, "wb") as f:
         buffer = BytesIO()
         img.save(buffer, format=image_format)
         buffer.seek(0)
+        await f.write(buffer.getvalue())
 
-        # Asynchronously write to file
-        async with aiofiles.open(file_path, "wb") as f:
-            await f.write(buffer.getvalue())
-
-        _LOGGER.info(f"Snapshot successfully saved: {file_path} ({image_format})")
-        return True
-    except Exception as e:
-        _LOGGER.error(f"Error saving {file_path}: {str(e)}")
-        return False
-
+    _LOGGER.info(f"Snapshot saved: {file_path} ({image_format})")

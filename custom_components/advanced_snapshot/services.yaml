@@ -24,6 +24,10 @@ take_snapshot:
       required: false
       selector:
         object:
+    crop_aspect_ratio:
+      example: "16:9"
+      selector:
+        text:
     add_bar:
       name: "Add Text Bar"
       required: false
