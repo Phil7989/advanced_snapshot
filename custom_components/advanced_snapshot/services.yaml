@@ -10,13 +10,13 @@ take_snapshot:
     file_path:
       name: "Save Path"
       required: true
-      example: "/config/www/push/snapshot.jpg"
+      example: snapshot.jpg
       selector:
         text:
     file_path_backup:
       name: "Backup Save Path"
       required: true
-      example: /config/www/backupsnapshots/{{ now().strftime("%y%m%d")}}_{{ now().strftime("%H%M%S")}}_snapshot.jpg
+      example: "{{ now().strftime('%y%m%d')}}_{{ now().strftime('%H%M%S')}}_snapshot.jpg"
       selector:
         text:
     crop:
@@ -56,9 +56,9 @@ take_snapshot:
       collaps: true
       fields:
         setting_font_path:
-          example: "/config/custom_components/advanced_snapshot/fonts/Arial.ttf"
+          example: Arial.ttf
           required: false
-          default: "/config/custom_components/advanced_snapshot/fonts/Arial.ttf"
+          default: Arial.ttf
           selector:
             text:
         setting_font_size:
