@@ -76,7 +76,7 @@
         },
         "setting_font_size": {
           "name": "Font Size",
-          "description": "Font size for the text bar."
+          "description": "Font size for the text bar. (number oder 'auto')"
         },
         "setting_font_color": {
           "name": "Font Color",
@@ -84,7 +84,7 @@
         },
         "setting_bar_height": {
           "name": "Bar Height",
-          "description": "Height of the bar beneath the image."
+          "description": "Height of the bar beneath the image. (number or percentage, e.g., 40 or 50%)"
         },
         "setting_bar_color": {
           "name": "Bar Color",

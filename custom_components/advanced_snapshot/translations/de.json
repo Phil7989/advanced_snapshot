@@ -76,7 +76,7 @@
         },
         "setting_font_size": {
           "name": "Schriftgröße",
-          "description": "Schriftgröße für die Textleiste."
+          "description": "Schriftgröße für die Textleiste. (Zahl oder 'auto')"
         },
         "setting_font_color": {
           "name": "Schriftfarbe",
@@ -84,7 +84,7 @@
         },
         "setting_bar_height": {
           "name": "Leistenhöhe",
-          "description": "Höhe der Leiste unterhalb des Bildes."
+          "description": "Höhe der Leiste unter dem Bild. (Zahl oder Prozentsatz, z. B. 40 oder 50%)"
         },
         "setting_bar_color": {
           "name": "Leistenfarbe",

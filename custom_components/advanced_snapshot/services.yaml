@@ -8,15 +8,13 @@ take_snapshot:
         entity:
           domain: camera
     file_path:
-      name: "Save Path"
       required: true
       example: snapshot.jpg
       selector:
         text:
     file_path_backup:
-      name: "Backup Save Path"
       required: true
-      example: "{{ now().strftime('%y%m%d')}}_{{ now().strftime('%H%M%S')}}_snapshot.jpg"
+      example: "{{ now().strftime('%y%m%d')}/{{ now().strftime('%H%M%S')}}_snapshot.jpg"
       selector:
         text:
     crop:
@@ -29,31 +27,27 @@ take_snapshot:
       selector:
         text:
     add_bar:
-      name: "Add Text Bar"
       required: false
       example: true
       selector:
         boolean:
     custom_text_left:
-      name: "Custom Text Left"
       required: false
       example: "Greenhouse"
       selector:
         text:
     custom_text_middle:
-      name: "Custom Text Middle"
       required: false
       example: "{{ states('sensor.garten_actual_temperature') }} °C"
       selector:
         text:
     custom_text_right:
-      name: "Custom Text Right"
       required: false
       example: "\"{{ now().strftime('%d.%m.%y %H:%M:%S') }}\""
       selector:
         text:
     settings:
-      collaps: true
+      collaps: false
       fields:
         setting_font_path:
           example: Arial.ttf
@@ -62,14 +56,11 @@ take_snapshot:
           selector:
             text:
         setting_font_size:
-          example: 20
+          example: "auto"
           required: false
-          default: 20
+          default: "auto"
           selector:
-            number:
-              min: 1
-              max: 50
-              step: 2
+            text:
         setting_font_color:
           example: "black"
           required: false
@@ -77,14 +68,11 @@ take_snapshot:
           selector:
             text:
         setting_bar_height:
-          example: 40
+          example: 7%
           required: false
-          default: 40
+          default: 7%
           selector:
-            number:
-              min: 10
-              max: 100
-              step: 5
+            text:
         setting_bar_color:
           example: "white"
           required: false
