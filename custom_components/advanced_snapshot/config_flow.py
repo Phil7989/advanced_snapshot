@@ -56,6 +56,7 @@ class AdvancedSnapshotOptionsFlowHandler(OptionsFlow):
 
         if user_input is not None:
             self.hass.config_entries.async_update_entry(config_entry, data={**config_entry.data, **user_input})
+            await self.hass.config_entries.async_reload(self.entry_id)
             return self.async_create_entry(title=DOMAIN, data={})
         
         data = self.config_entry.data
