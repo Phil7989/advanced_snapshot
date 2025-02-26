@@ -13,8 +13,8 @@ take_snapshot:
       selector:
         text:
     file_path_backup:
-      required: true
-      example: "{{ now().strftime('%y%m%d')}/{{ now().strftime('%H%M%S')}}_snapshot.jpg"
+      required: false
+      example: "{{ now().strftime('%y%m%d')}}/{{ now().strftime('%H%M%S')}}_snapshot.jpg"
       selector:
         text:
     crop:
