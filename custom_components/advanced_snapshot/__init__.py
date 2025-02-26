@@ -24,9 +24,9 @@ SERVICE_SCHEMA = vol.Schema({
     vol.Optional("custom_text_middle", default=""): cv.string,
     vol.Optional("custom_text_right", default=""): cv.string,
     vol.Optional("setting_font_path", default="/config/custom_components/advanced_snapshot/fonts/Arial.ttf"): cv.string,
-    vol.Optional("setting_font_size", default=20): vol.Coerce(int),
+    vol.Optional("setting_font_size", default="auto"): vol.Any(vol.Coerce(int), vol.In(["auto"])),
     vol.Optional("setting_font_color", default="black"): cv.string,
-    vol.Optional("setting_bar_height", default=40): vol.Coerce(int),
+    vol.Optional("setting_bar_height", default="40"): vol.Any(vol.Coerce(int), vol.Match(r"^\d+%$")),
     vol.Optional("setting_bar_color", default="white"): cv.string,
     vol.Optional("setting_bar_position", default="bottom"): cv.string
 })
@@ -83,8 +83,8 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
         custom_text_left = call.data.get("custom_text_left", "")
         custom_text_middle = call.data.get("custom_text_middle", "")
         custom_text_right = call.data.get("custom_text_right", "")
-        setting_font_size = call.data.get("setting_font_size", 20)
-        setting_bar_height = call.data.get("setting_bar_height", 40)
+        setting_font_size = call.data.get("setting_font_size")
+        setting_bar_height = call.data.get("setting_bar_height")
         setting_bar_color = call.data.get("setting_bar_color", "white")
         setting_bar_position = call.data.get("setting_bar_position", "bottom")
 
@@ -103,6 +103,9 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
             event_data["error"] = "Image could not be retrieved"
             return event_data
 
+        img = Image.open(BytesIO(image.content))
+        event_data["original_resolution"] = [img.width, img.height]
+        
         if crop:
             if len(crop) < 3:
                 _LOGGER.error("Invalid crop values: crop must have at least [x, y, width]")
@@ -132,8 +135,6 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
                 event_data["error"] = "Invalid crop dimensions"
                 return event_data
 
-            img = Image.open(BytesIO(image.content))
-            event_data["original_resolution"] = [img.width, img.height]
             if (x + w) > img.width or (y + h) > img.height:
                 _LOGGER.error(f"Invalid crop area: ({x}, {y}, {w}, {h}) exceeds image size")
                 event_data["error"] = "Invalid crop area"
@@ -175,11 +176,29 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
     return event_data
 
 def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: str,
-                 custom_text_right: str, setting_font_path: str, setting_font_size: int,
-                 setting_font_color: str, setting_bar_height: int,
+                 custom_text_right: str, setting_font_path: str, setting_font_size,
+                 setting_font_color: str, setting_bar_height,
                  setting_bar_color: str, setting_bar_position: str, event_data: dict) -> Image.Image:
     width, height = img.size
-    bar_height = setting_bar_height
+
+    if isinstance(setting_bar_height, str) and setting_bar_height.endswith('%'):
+        try:
+            percentage = float(setting_bar_height.strip('%')) / 100.0
+            bar_height = int(height * percentage)
+        except ValueError:
+            _LOGGER.warning(f"Invalid percentage value for setting_bar_height: {setting_bar_height}. Using default 40px.")
+            event_data["error"] = f"Invalid percentage value: {setting_bar_height}. Using default 40px."
+            bar_height = 40
+    else:
+        try:
+            bar_height = int(setting_bar_height)
+        except ValueError:
+            _LOGGER.warning(f"Invalid pixel value for setting_bar_height: {setting_bar_height}. Using default 40px.")
+            event_data["error"] = f"Invalid pixel value: {setting_bar_height}. Using default 40px."
+            bar_height = 40 
+
+    if setting_font_size == "auto":
+        setting_font_size = max(10, int(bar_height * 0.5))
 
     if setting_bar_position == "top":
         new_img = Image.new("RGB", (width, height + bar_height), setting_bar_color)
@@ -205,6 +224,7 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
               custom_text_right, fill=setting_font_color, font=font)
 
     return new_img
+
 
 async def async_save_image(img: Image.Image, file_path: str):
     ext = os.path.splitext(file_path)[1].lower()
