@@ -65,7 +65,7 @@ data:
 - **custom_text_left, custom_text_middle, custom_text_right (Optional):** Texts to be displayed on the left, center, and right of the bar.
 - **setting_font_path (Optional):** The font path can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration. (defaults to `Arial.ttf`).
 - **setting_font_size (Optional):** Font size for the text bar. (number oder 'auto')
-- **setting_font_color (Optional):** Color of the text (default is `black`). You can use color names like white, black, etc., as well as RGB values in the format RGB(0,0,0).
+- **setting_font_color (Optional):** Color of the text (default is `black`). You can use color names like white, black, etc., as well as RGB values in the format RGB(255,255,255).
 - **setting_bar_height (Optional):** Height of the bar. (number or percentage, e.g., 40 or 50%)
 - **setting_bar_color (Optional):** Color of the bar (default is `white`). You can use color names like white, black, etc., as well as RGB values in the format RGB(0,0,0).
 - **setting_bar_position (Optional):** Position of the bar (`top` or `bottom`).
