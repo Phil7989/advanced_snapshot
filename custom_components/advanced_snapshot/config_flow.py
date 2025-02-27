@@ -10,7 +10,7 @@ from homeassistant.config_entries import OptionsFlow
 from .const import DOMAIN
 
 class AdvancedSnapshotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Advanced Sddddnapshot."""
+    """Config flow for Advanced Sdddnapshot."""
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
