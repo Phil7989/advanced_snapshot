@@ -40,7 +40,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    _LOGGER.info(f"Loading Advanced Snapshot configuration: {entry.data}")
+    _LOGGER.info(f"Loading Advanced Snapshot 5configuration: {entry.data}")
     hass.data[DOMAIN] = entry.data
     hass.services.async_register(
         DOMAIN, "take_snapshot", partial(handle_take_snapshot, hass),
