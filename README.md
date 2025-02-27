@@ -38,37 +38,37 @@ After installation, you can use the `advanced_snapshot` service to take snapshot
 service: advanced_snapshot.take_snapshot
 data:
   camera_entity_id: camera.your_camera_front_door
-  file_path: /config/www/frontdoor.jpg
-  file_path_backup: >-
-    /config/www/backupsnapshots/{{ now().strftime('%y%m%d')}}_{{
-    now().strftime('%H%M%S')}}_frontdoor.jpg
+  file_path: frontdoor.jpg
+  file_path_backup: {{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.jpg
   crop: [100, 100, 400, 300]  # (x, y, width, height)
+  crop_aspect_ratio: "16:9"
   add_bar: true
   custom_text_left: "Front Door"
   custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
   custom_text_right: "{{ now().strftime('%d.%m.%y %H:%M:%S') }}"
-  setting_font_path: "/config/custom_components/advanced_snapshot/Arial.ttf"
-  setting_font_size: 20
+  setting_font_path: "Arial.ttf"
+  setting_font_size: "auto"
   setting_font_color: "black"
-  setting_bar_height: 40
+  setting_bar_height: 7%
   setting_bar_color: "white"
   setting_bar_position: "bottom"
 ```
 
 ### Parameters
 
-- **camera_entity_id** (Required): The entity ID of the camera you want to capture a snapshot from.
-- **file_path** (Required): The path where the snapshot will be saved.
-- **file_path_backup** (Optional): A backup path where a copy of the snapshot will be saved.
-- **crop** (Optional): List with four integers `[x, y, width, height]` to crop the image. If not provided, the full image will be used.
-- **add_bar** (Optional): If set to `true`, a text bar will be added to the snapshot.
-- **custom_text_left**, **custom_text_middle**, **custom_text_right** (Optional): Texts to be displayed on the left, center, and right of the bar.
-- **setting_font_path** (Optional): Path to the font file (defaults to `/config/custom_components/advanced_snapshot/Arial.ttf`).
-- **setting_font_size** (Optional): Font size for the text (default is 20).
-- **setting_font_color** (Optional): Color of the text (default is `black`).
-- **setting_bar_height** (Optional): Height of the bar (default is 40).
-- **setting_bar_color** (Optional): Color of the bar (default is `white`).
-- **setting_bar_position** (Optional): Position of the bar (`top` or `bottom`).
+- **camera_entity_id (Required):** The entity ID of the camera you want to capture a snapshot from.
+- **file_path (Required):** The path where the snapshot will be saved can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration.
+- **file_path_backup (Optional):** A backup path can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration.
+- **crop (Optional):** Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored.
+- **crop_aspect_ratio (Optional):** Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically.
+- **add_bar (Optional):** If set to `true`, a text bar will be added to the snapshot.
+- **custom_text_left, custom_text_middle, custom_text_right (Optional):** Texts to be displayed on the left, center, and right of the bar.
+- **setting_font_path (Optional):** The font path can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration. (defaults to `Arial.ttf`).
+- **setting_font_size (Optional):** Font size for the text bar. (number oder 'auto')
+- **setting_font_color (Optional):** Color of the text (default is `black`). You can use color names like white, black, etc., as well as RGB values in the format RGB(0,0,0).
+- **setting_bar_height (Optional):** Height of the bar. (number or percentage, e.g., 40 or 50%)
+- **setting_bar_color (Optional):** Color of the bar (default is `white`). You can use color names like white, black, etc., as well as RGB values in the format RGB(0,0,0).
+- **setting_bar_position (Optional):** Position of the bar (`top` or `bottom`).
 
 ### Response
 
