@@ -1,8 +1,6 @@
 {
   "name": "Advanced Snapshot",
-  "description": "Advanced snapshot feature for Home Assistant.",
   "country": "DE",
-  "domains": ["camera"],
   "homeassistant": "2023.1.0",
   "render_readme": true,
   "zip_release": false,

@@ -1,10 +1,11 @@
 {
   "domain": "advanced_snapshot",
   "name": "Advanced Snapshot",
-  "version": "2025.3",
+  "version": "2025.2.3.1",
   "config_flow": true,
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "requirements": ["Pillow"],
   "dependencies": ["camera"],
-  "codeowners": ["@Phil7989"]
+  "codeowners": ["@Phil7989"],
+  "iot_class": "none"
 }
