@@ -47,7 +47,7 @@ take_snapshot:
       selector:
         text:
     settings:
-      collaps: false
+      collapsed: true
       fields:
         setting_font_path:
           example: Arial.ttf
