@@ -98,7 +98,12 @@
           "name": "Leistenposition",
           "description": "Position der Textleiste (oben oder unten)."
         }
-      }
+      },
+      "sections": {
+        "settings": {
+          "name": "Only needed if there is more than one OPNsense Router"
+        }
+    }
     }
   }
 }

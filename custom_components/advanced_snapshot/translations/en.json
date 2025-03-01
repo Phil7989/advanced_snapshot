@@ -98,7 +98,13 @@
           "name": "Bar Position",
           "description": "Position of the text bar (top or bottom)."
         }
+      },
+      "sections": {
+        "settings": {
+          "name": "Only needed if there is more than one OPNsense Router"
+        }
       }
+    }
     }
   }
 }
