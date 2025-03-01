@@ -71,7 +71,8 @@
           "description": "Text that should appear on the right side of the text bar (e.g., a timestamp)."
         },
         "settings": {
-          "name": "Settings"
+          "name": "Settings",
+          "description": "more settings"
         },
         "setting_font_path": {
           "name": "Font Path",
