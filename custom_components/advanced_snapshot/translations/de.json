@@ -70,10 +70,6 @@
           "name": "Benutzerdefinierter Text rechts",
           "description": "Text, der auf der rechten Seite der Textleiste erscheinen soll."
         },
-        "settings": {
-          "name": "Einstellungen",
-          "description": "weitere Einstellungen zu Schrift und Textleiste"
-        },
         "setting_font_path": {
           "name": "Schriftart-Pfad",
           "description": "Pfad zur Schriftart."
@@ -101,7 +97,7 @@
       },
       "sections": {
         "settings": {
-          "name": "Only needed if there is more than one OPNsense Router"
+          "name": "Einstellungen"
         }
     }
     }

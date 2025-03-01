@@ -31,7 +31,7 @@
   },
   "services": {
     "take_snapshot": {
-      "name": "save Snapshot",
+      "name": "take Snapshot",
       "description": "Takes a snapshot from the specified camera, crops it, and saves it with optional text.",
       "fields": {
         "camera_entity_id": {
@@ -70,10 +70,6 @@
           "name": "Custom Text Right",
           "description": "Text that should appear on the right side of the text bar (e.g., a timestamp)."
         },
-        "settings": {
-          "name": "Settings",
-          "description": "more settings"
-        },
         "setting_font_path": {
           "name": "Font Path",
           "description": "Path to the font."
@@ -101,7 +97,7 @@
       },
       "sections": {
         "settings": {
-          "name": "Only needed if there is more than one OPNsense Router"
+          "name": "Settings"
         }
       }
     }
