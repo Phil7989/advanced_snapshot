@@ -2,7 +2,7 @@ take_snapshot:
   name: "Take Camera Snapshot"
   fields:
     camera_entity_id:
-      example: "camera.cam_gewaechshaus_schnappdschusse_klar"
+      example: "camera.cam_gewaechshaus_schnappschusse_klar"
       required: true
       selector:
         entity:
