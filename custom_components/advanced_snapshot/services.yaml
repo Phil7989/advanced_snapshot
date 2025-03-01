@@ -47,6 +47,7 @@ take_snapshot:
       selector:
         text:
     settings:
+      name: "Settings"
       collapsed: true
       fields:
         setting_font_path:
