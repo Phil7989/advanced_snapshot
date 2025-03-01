@@ -46,7 +46,7 @@ take_snapshot:
       example: "\"{{ now().strftime('%d.%m.%y %H:%M:%S') }}\""
       selector:
         text:
-    setting:
+    settings:
       collapsed: true
       fields:
         setting_font_path:
