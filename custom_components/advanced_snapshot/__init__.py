@@ -31,6 +31,8 @@ SERVICE_SCHEMA = vol.Schema({
     vol.Optional("setting_bar_position", default="bottom"): cv.string
 })
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 async def async_setup(hass: HomeAssistant, config: dict):
     _LOGGER.info("Registering the take_snapshot service.")
     hass.services.async_register(
