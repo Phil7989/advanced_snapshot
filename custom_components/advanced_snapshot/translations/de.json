@@ -54,6 +54,81 @@
           "name": "Zuschneideverhältnis",
           "description": "Optionales Seitenverhältnis (z. B. '16:9'). Wenn festgelegt, wird die Höhe in 'crop' ignoriert und automatisch berechnet."
         },
+        "rotate_angle": {
+          "name": "Drehwinkel",
+          "description": "Optionaler Drehwinkel (e.g., '180') um den Snapshot zu drehen."
+        },
+        "add_bar": {
+          "name": "Textleiste hinzufügen",
+          "description": "Fügt eine weiße Leiste mit Text am unteren Bildrand hinzu."
+        },
+        "custom_text_left": {
+          "name": "Benutzerdefinierter Text links",
+          "description": "Text, der auf der linken Seite der Textleiste erscheinen soll."
+        },
+        "custom_text_middle": {
+          "name": "Benutzerdefinierter Text Mitte",
+          "description": "Text, der in der Mitte der Textleiste erscheinen soll."
+        },
+        "custom_text_right": {
+          "name": "Benutzerdefinierter Text rechts",
+          "description": "Text, der auf der rechten Seite der Textleiste erscheinen soll."
+        },
+        "setting_font_path": {
+          "name": "Schriftart-Pfad",
+          "description": "Pfad zur Schriftart."
+        },
+        "setting_font_size": {
+          "name": "Schriftgröße",
+          "description": "Schriftgröße für die Textleiste. (Zahl oder 'auto')"
+        },
+        "setting_font_color": {
+          "name": "Schriftfarbe",
+          "description": "Schriftfarbe für die Textleiste."
+        },
+        "setting_bar_height": {
+          "name": "Leistenhöhe",
+          "description": "Höhe der Leiste unter dem Bild. (Zahl oder Prozentsatz, z. B. 40 oder 50%)"
+        },
+        "setting_bar_color": {
+          "name": "Leistenfarbe",
+          "description": "Farbe der Textleiste."
+        },
+        "setting_bar_position": {
+          "name": "Leistenposition",
+          "description": "Position der Textleiste (oben oder unten)."
+        }
+      },
+      "sections": {
+        "settings": {
+          "name": "Einstellungen"
+        }
+    }
+    },
+    "record_video": {
+      "name": "Video aufnehmen",
+      "description": "Nimmt einen Video von der angegebenen Kamera auf, schneidet ihn zu und speichert ihn mit optionalem Text.",
+      "fields": {
+        "camera_entity_id": {
+          "name": "Kamera",
+          "description": "Die Kamera, von der das Video aufgenommen werden soll."
+        },
+        "file_path": {
+          "name": "Speicherpfad",
+          "description": "Pfad, unter dem das Video gespeichert werden soll."
+        },
+        "file_path_backup": {
+          "name": "Backup-Speicherpfad",
+          "description": "Pfad, unter dem die Sicherungskopie des Videos gespeichert werden soll."
+        },
+        "crop": {
+          "name": "Zuschneiden",
+          "description": "Definiert den Zuschnittbereich als [x, y, Breite, Höhe]. Wenn ein Seitenverhältnis festgelegt ist, wird die Höhe ignoriert."
+        },
+        "crop_aspect_ratio": {
+          "name": "Zuschneideverhältnis",
+          "description": "Optionales Seitenverhältnis (z. B. '16:9'). Wenn festgelegt, wird die Höhe in 'crop' ignoriert und automatisch berechnet."
+        },
         "add_bar": {
           "name": "Textleiste hinzufügen",
           "description": "Fügt eine weiße Leiste mit Text am unteren Bildrand hinzu."

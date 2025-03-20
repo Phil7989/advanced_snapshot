@@ -26,6 +26,10 @@ take_snapshot:
       example: "16:9"
       selector:
         text:
+    rotate_angle: 
+      example: 10
+      selector:
+        text:
     add_bar:
       required: false
       example: true
@@ -88,3 +92,102 @@ take_snapshot:
               options:
                 - "top"
                 - "bottom"
+record_video:
+  name: "Record Video"
+  fields:
+    camera_entity_id:
+      example: "camera.cam_gewaechshaus_klar"
+      required: true
+      selector:
+        entity:
+          domain: camera
+    duration:
+          example: 40
+          required: true    
+          default: 40
+          selector:
+            text:
+    file_path:
+      required: true
+      example: video.mp4
+      selector:
+        text:
+    file_path_backup:
+      required: false
+      example: "{{ now().strftime('%y%m%d')}}/{{ now().strftime('%H%M%S')}}_video.mp4"
+      selector:
+        text:
+    crop:
+      example: "[500, 100, 1066, 600]"
+      required: false
+      selector:
+        object:
+    crop_aspect_ratio:
+      example: "16:9"
+      selector:
+        text:
+    add_bar:
+      required: false
+      example: true
+      selector:
+        boolean:
+    custom_text_left:
+      required: false
+      example: "Greenhouse"
+      selector:
+        text:
+    custom_text_middle:
+      required: false
+      example: "{{ states('sensor.garten_actual_temperature') }} °C"
+      selector:
+        text:
+    custom_text_right:
+      required: false
+      example: "\"{{ now().strftime('%d.%m.%y %H:%M:%S') }}\""
+      selector:
+        text:
+    settings:
+      collapsed: true
+      fields:
+        setting_font_path:
+          example: Arial.ttf
+          required: false
+          default: Arial.ttf
+          selector:
+            text:
+        setting_font_size:
+          example: "auto"
+          required: false
+          default: "auto"
+          selector:
+            text:
+        setting_font_color:
+          example: "black"
+          required: false
+          default: "black"
+          selector:
+            text:
+        setting_bar_height:
+          example: 7%
+          required: false
+          default: 7%
+          selector:
+            text:
+        setting_bar_color:
+          example: "white"
+          required: false
+          default: "white"
+          selector:
+            text:
+        setting_bar_position:
+          example: "bottom"
+          required: false
+          default: "bottom"
+          selector:
+            select:
+              options:
+                - "top"
+                - "bottom"
+                
+                
+                

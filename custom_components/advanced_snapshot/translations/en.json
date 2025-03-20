@@ -54,6 +54,81 @@
           "name": "Crop Aspect Ratio",
           "description": "Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically."
         },
+        "rotate_angle": {
+          "name": "rotate angle",
+          "description": "Optional rotate_angle (e.g., '180'). to rotate the snapshot"
+        },
+        "add_bar": {
+          "name": "Add Text Bar",
+          "description": "Adds a white bar with text to the bottom of the image."
+        },
+        "custom_text_left": {
+          "name": "Custom Text Left",
+          "description": "Text that should appear on the left side of the text bar."
+        },
+        "custom_text_middle": {
+          "name": "Custom Text Middle",
+          "description": "Text that should appear in the center of the text bar (e.g., an entity value)."
+        },
+        "custom_text_right": {
+          "name": "Custom Text Right",
+          "description": "Text that should appear on the right side of the text bar (e.g., a timestamp)."
+        },
+        "setting_font_path": {
+          "name": "Font Path",
+          "description": "Path to the font."
+        },
+        "setting_font_size": {
+          "name": "Font Size",
+          "description": "Font size for the text bar. (number oder 'auto')"
+        },
+        "setting_font_color": {
+          "name": "Font Color",
+          "description": "Font color for the text bar."
+        },
+        "setting_bar_height": {
+          "name": "Bar Height",
+          "description": "Height of the bar beneath the image. (number or percentage, e.g., 40 or 50%)"
+        },
+        "setting_bar_color": {
+          "name": "Bar Color",
+          "description": "Color of the text bar."
+        },
+        "setting_bar_position": {
+          "name": "Bar Position",
+          "description": "Position of the text bar (top or bottom)."
+        }
+      },
+      "sections": {
+        "settings": {
+          "name": "Settings"
+        }
+      }
+    },
+    "record_video": {
+      "name": "record Video",
+      "description": "Record a video from the specified camera, crops it, and saves it with optional text.",
+      "fields": {
+        "camera_entity_id": {
+          "name": "Camera",
+          "description": "The camera from which the video should be record."
+        },
+        "file_path": {
+          "name": "Save Path",
+          "description": "Path where the video should be saved."
+        },
+        "file_path_backup": {
+          "name": "Backup Save Path",
+          "description": "Path where the backup of the video should be saved."
+        },
+        "crop": {
+          "name": "Crop",
+          "description": "Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored."
+        },
+        "crop_aspect_ratio": {
+          "name": "Crop Aspect Ratio",
+          "description": "Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically."
+        },
         "add_bar": {
           "name": "Add Text Bar",
           "description": "Adds a white bar with text to the bottom of the image."

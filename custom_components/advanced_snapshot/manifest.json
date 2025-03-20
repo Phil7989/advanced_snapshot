@@ -3,11 +3,11 @@
   "name": "Advanced Snapshot",
   "codeowners": ["@Phil7989"],
   "config_flow": true,
-  "dependencies": ["camera"],
+  "dependencies": ["camera", "ffmpeg"],
   "documentation": "https://github.com/Phil7989/advanced_snapshot",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/Phil7989/advanced_snapshot/issues",
-  "requirements": ["Pillow"],
+  "requirements": ["Pillow", "ffmpeg-python"],
   "single_config_entry": true,
   "version": "2025.2.3.1"
 }
