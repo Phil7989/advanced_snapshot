@@ -121,6 +121,10 @@
           "name": "Backup-Speicherpfad",
           "description": "Pfad, unter dem die Sicherungskopie des Videos gespeichert werden soll."
         },
+        "duration": {
+          "name": "Länge",
+          "description": "Länge des Videos. max. 40 Sekunden"
+        },
         "crop": {
           "name": "Zuschneiden",
           "description": "Definiert den Zuschnittbereich als [x, y, Breite, Höhe]. Wenn ein Seitenverhältnis festgelegt ist, wird die Höhe ignoriert."

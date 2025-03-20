@@ -121,6 +121,10 @@
           "name": "Backup Save Path",
           "description": "Path where the backup of the video should be saved."
         },
+        "duration": {
+          "name": "Duration",
+          "description": "Duration of the video. max. 40 sec"
+        },
         "crop": {
           "name": "Crop",
           "description": "Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored."
