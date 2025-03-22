@@ -3,6 +3,7 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 import aiofiles
+import asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
@@ -23,7 +24,7 @@ SERVICE_SCHEMA = vol.Schema({
     vol.Optional("file_path_backup"): cv.string,
     vol.Optional("crop", default=None): vol.Any(None, [vol.Coerce(int)]),
     vol.Optional("crop_aspect_ratio", default=None): vol.Any(None, vol.Match(r"^\d+:\d+$")),
-    vol.Optional("rotate_angle", default=0): vol.All(vol.Coerce(int), vol.Range(min=1, max=360)),
+    vol.Optional("rotate_angle", default=0): vol.All(vol.Coerce(int), vol.Range(min=0, max=360)),
     vol.Optional("add_bar", default=False): cv.boolean,
     vol.Optional("custom_text_left", default=""): cv.string,
     vol.Optional("custom_text_middle", default=""): cv.string,
@@ -293,17 +294,6 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
                 "height": metadata["streams"][0].get("height")
             }
         
-    if add_bar:
-        bar_height = setting_bar_height if "%" not in setting_bar_height else "40"
-        font_size = setting_font_size if setting_font_size != "auto" else "24"
-        font_color = setting_font_color
-        bar_color = setting_bar_color
-        bar_position = setting_bar_position
-        text_filter = f"drawtext=fontfile='{setting_font_path}': text='{custom_text_left}    {custom_text_middle}    {custom_text_right}': " \
-                      f"x=(w-text_w)/2: y={('h-text_h' if bar_position == 'bottom' else '0')}: " \
-                      f"fontsize={font_size}: fontcolor={font_color}: box=1: boxcolor={bar_color}@0.8: boxborderw={bar_height}"
-        filters.append(text_filter)
-        
     if crop:
         if len(crop) < 3:
             event_data["error"] = "Invalid crop values"
@@ -330,18 +320,31 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
 
         crop_filter = f"crop={w}:{h}:{x}:{y}"
         filters.append(crop_filter)
+    
+    if add_bar:
+        bar_height = setting_bar_height if "%" not in setting_bar_height else "40"
+        font_size = setting_font_size if setting_font_size != "auto" else "24"
+        font_color = setting_font_color
+        bar_color = setting_bar_color
+        bar_position = setting_bar_position
+        text_filter = f"box=1: boxcolor={bar_color}@0.8: boxborderw={bar_height}"
+        filters.append(text_filter)
         
-        if filters:
-            command.extend(["-vf", ",".join(filters)])
+        
+    if filters:
+        command.extend(["-vf", ",".join(filters)])
 
     command.append(temp_video_path)
+    
+    event_data["ffmpeg_command"] = " ".join(command)
 
-    process = await hass.async_add_executor_job(lambda: subprocess.run(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
-
+    process = await asyncio.create_subprocess_exec(
+    *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
-        event_data["error"] = f"FFmpeg failed with error: {process.stderr.strip()}"
-        return event_data
+        event_data["error"] = f"FFmpeg failed with error: {stderr.decode().strip()}"
+    return event_data
 
     os.rename(temp_video_path, file_path)
 

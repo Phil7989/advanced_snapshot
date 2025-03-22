@@ -1,6 +1,6 @@
 {
   "domain": "advanced_snapshot",
-  "name": "Advanced Snapshot",
+  "name": "Advanced Snapshot & Video",
   "codeowners": ["@Phil7989"],
   "config_flow": true,
   "dependencies": ["camera", "ffmpeg"],

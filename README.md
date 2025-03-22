@@ -32,7 +32,12 @@ Go to Configuration -> Integrations and click on "add integration". Then search 
 
 ## 🔧 Usage
 
-After installation, you can use the `advanced_snapshot` service to take snapshots from your camera entities. To call the service, use the following YAML:
+After installation, you can use the advanced_snapshot service to capture snapshots or record videos from your camera entities. There are two available actions:
+
+`take_snapshot`: Captures a snapshot from the camera.
+`record_video`: Records a video using the camera.
+
+You can call the desired action using the following YAML:
 
 ```yaml
 service: advanced_snapshot.take_snapshot
@@ -42,6 +47,7 @@ data:
   file_path_backup: {{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.jpg
   crop: [100, 100, 400, 300]  # (x, y, width, height)
   crop_aspect_ratio: "16:9"
+  rotate_angle: 90
   add_bar: true
   custom_text_left: "Front Door"
   custom_text_middle: "{{ states('sensor.garten_actual_temperature') }} °C"
@@ -54,6 +60,16 @@ data:
   setting_bar_position: "bottom"
 ```
 
+```yaml
+service: advanced_snapshot.record_video
+data:
+  camera_entity_id: camera.your_camera_front_door
+  file_path: frontdoor.mp4
+  file_path_backup: {{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.mp4
+  crop: [100, 100, 400, 300]  # (x, y, width, height)
+  crop_aspect_ratio: "16:9"
+```
+
 ### Parameters
 
 - **camera_entity_id (Required):** The entity ID of the camera you want to capture a snapshot from.
@@ -61,6 +77,7 @@ data:
 - **file_path_backup (Optional):** A backup path can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration.
 - **crop (Optional):** Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored.
 - **crop_aspect_ratio (Optional):** Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically.
+- **rotate_angle (Optional):** to rotate the snapshot (e.g. 90)
 - **add_bar (Optional):** If set to `true`, a text bar will be added to the snapshot.
 - **custom_text_left, custom_text_middle, custom_text_right (Optional):** Texts to be displayed on the left, center, and right of the bar.
 - **setting_font_path (Optional):** The font path can be either a relative or an absolute path. If a relative path is provided, it will be completed based on the configuration. (defaults to `Arial.ttf`).

@@ -1,7 +1,7 @@
 {
   "name": "Advanced Snapshot & Video",
   "country": "DE",
-  "homeassistant": "2023.1.0",
+  "homeassistant": "2023.3.0",
   "render_readme": true,
   "zip_release": false,
   "filename": "custom_components/advanced_snapshot"
