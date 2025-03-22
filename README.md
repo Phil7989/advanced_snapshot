@@ -67,6 +67,7 @@ data:
   camera_entity_id: camera.your_camera_front_door
   file_path: frontdoor.mp4
   file_path_backup: {{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.mp4
+  duration: 40
   crop: [100, 100, 400, 300]  # (x, y, width, height)
   crop_aspect_ratio: "16:9"
 ```
