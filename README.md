@@ -35,6 +35,7 @@ Go to Configuration -> Integrations and click on "add integration". Then search 
 After installation, you can use the advanced_snapshot service to capture snapshots or record videos from your camera entities. There are two available actions:
 
 `take_snapshot`: Captures a snapshot from the camera.
+
 `record_video`: Records a video using the camera.
 
 You can call the desired action using the following YAML:
