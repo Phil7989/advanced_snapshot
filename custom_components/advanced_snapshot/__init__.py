@@ -4,6 +4,8 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 import aiofiles
 import asyncio
+import datetime
+import math
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
@@ -16,15 +18,17 @@ from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from .const import DOMAIN
 
+    
+
 _LOGGER = logging.getLogger(__name__)
 
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("camera_entity_id"): cv.entity_id,
     vol.Required("file_path"): cv.string,
     vol.Optional("file_path_backup"): cv.string,
+    vol.Optional("rotate_angle", default=0): vol.All(vol.Coerce(int), vol.Range(min=0, max=360)),
     vol.Optional("crop", default=None): vol.Any(None, [vol.Coerce(int)]),
     vol.Optional("crop_aspect_ratio", default=None): vol.Any(None, vol.Match(r"^\d+:\d+$")),
-    vol.Optional("rotate_angle", default=0): vol.All(vol.Coerce(int), vol.Range(min=0, max=360)),
     vol.Optional("add_bar", default=False): cv.boolean,
     vol.Optional("custom_text_left", default=""): cv.string,
     vol.Optional("custom_text_middle", default=""): cv.string,
@@ -42,6 +46,7 @@ SERVICE_SCHEMA_RECORD_VIDEO = vol.Schema({
     vol.Required("file_path"): cv.string,
     vol.Optional("file_path_backup"): cv.string,
     vol.Optional("duration", default=40): vol.All(vol.Coerce(int), vol.Range(min=1, max=40)),
+    vol.Optional("rotate_angle", default=0): vol.All(vol.Coerce(int), vol.Range(min=0, max=360)),
     vol.Optional("crop", default=None): vol.Any(None, [vol.Coerce(int)]),
     vol.Optional("crop_aspect_ratio", default=None): vol.Any(None, vol.Match(r"^\d+:\d+$")),
     vol.Optional("add_bar", default=False): cv.boolean,
@@ -86,7 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Unloading Advanced Snapshot integration.")
     hass.services.async_remove(DOMAIN, "take_snapshot")
-    hass.services.asnyc_remove(DOMAIN, "record_video")
+    hass.services.asnyc_remove(DOMAIN, "handle_record_video")
     if DOMAIN in hass.data:
         del hass.data[DOMAIN]
     return True
@@ -113,9 +118,9 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
             setting_font_path = os.path.join(font_folder, setting_font_path)
         if not os.path.splitext(setting_font_path)[1]:  
             setting_font_path += ".ttf"
+        rotate_angle = call.data.get("rotate_angle")
         crop = call.data.get("crop")
         crop_aspect_ratio = call.data.get("crop_aspect_ratio")
-        rotate_angle = call.data.get("rotate_angle")
         add_bar = call.data.get("add_bar", False)
         custom_text_left = call.data.get("custom_text_left", "")
         custom_text_middle = call.data.get("custom_text_middle", "")
@@ -221,19 +226,20 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
     file_path = call.data["file_path"]
     file_path_backup = call.data.get("file_path_backup")
     duration = min(call.data.get("duration", 40), 40)
+    rotate_angle = call.data.get("rotate_angle")
     crop = call.data.get("crop")
     crop_aspect_ratio = call.data.get("crop_aspect_ratio")
     add_bar = call.data.get("add_bar", False)
     custom_text_left = call.data.get("custom_text_left", "")
     custom_text_middle = call.data.get("custom_text_middle", "")
     custom_text_right = call.data.get("custom_text_right", "")
-    setting_font_path = call.data.get("setting_font_path", "/config/custom_components/advanced_snapshot/fonts/Arial.ttf")
+    setting_font_path = call.data.get("setting_font_path")
     setting_font_size = call.data.get("setting_font_size", "auto")
     setting_font_color = call.data.get("setting_font_color", "black")
     setting_bar_height = call.data.get("setting_bar_height", "40")
     setting_bar_color = call.data.get("setting_bar_color", "white")
     setting_bar_position = call.data.get("setting_bar_position", "bottom")
-    
+
     snapshot_folder = hass.data.get(DOMAIN, {}).get("snapshot_folder")
     backup_folder = hass.data.get(DOMAIN, {}).get("backup_folder")
     font_folder = hass.data.get(DOMAIN, {}).get("font_folder")
@@ -246,134 +252,149 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
 
     if not os.path.isabs(setting_font_path):
         setting_font_path = os.path.join(font_folder, setting_font_path)
-    if not os.path.splitext(setting_font_path)[1]:  
+    if not os.path.splitext(setting_font_path)[1]:
         setting_font_path += ".ttf"
-        
-    event_data = {
-        "success": False,
-        "file_path": file_path,
-        "backup_path": file_path_backup,
-        "original_resolution": None,
-        "final_resolution": None,
-        "error": None
-    }
-
-    filters = []
 
     stream = await async_get_stream_source(hass, camera_entity_id)
     if not stream:
-        event_data["error"] = "Camera stream could not be started"
-        return event_data
+        return {"success": False, "error": "Camera stream could not be started"}
 
-    base_path, ext = os.path.splitext(file_path)
-    if ext.lower() != ".mp4":
-        ext = ".mp4"
-    temp_video_path = f"{base_path}.temp{ext}"
-    command = [
-        "ffmpeg",
-        "-i", stream,
-        "-t", str(duration),
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-crf", "23",
-        "-c:a", "aac",
-        "-strict", "experimental",
-    ]
+    # Originalauflösung bestimmen
+    try:
+        probe = ffmpeg.probe(stream)
+        video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
+        original_resolution = {
+            "width": int(video_stream["width"]),
+            "height": int(video_stream["height"])
+        }
+    except Exception:
+        original_resolution = None
 
-    probe_original = await hass.async_add_executor_job(lambda: subprocess.run(
-        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "json", stream],
-        capture_output=True, text=True
-    ))
+    stream_input = ffmpeg.input(stream)
+    video = stream_input.video
 
-    if probe_original.returncode == 0:
-        import json
-        metadata = json.loads(probe_original.stdout)
-        if "streams" in metadata and len(metadata["streams"]) > 0:
-            event_data["original_resolution"] = {
-                "width": metadata["streams"][0].get("width"),
-                "height": metadata["streams"][0].get("height")
-            }
-        
-    if crop:
-        if len(crop) < 3:
-            event_data["error"] = "Invalid crop values"
-            return event_data
-
+    if rotate_angle:
+            rotation_angle_rad = math.radians(rotate_angle)
+            video = video.filter('rotate', rotation_angle_rad, fillcolor='black')
+            _LOGGER.info(f"Rotated image by {rotate_angle} degrees")
+    
+    # CROP
+    if crop and len(crop) >= 3:
         x, y, w = crop[:3]
         h = crop[3] if len(crop) == 4 else None
-
-        if crop_aspect_ratio:
+        if crop_aspect_ratio and not h:
             try:
                 aspect_w, aspect_h = map(int, crop_aspect_ratio.split(":"))
-                h = int(w * (aspect_h / aspect_w))
-            except ValueError:
-                event_data["error"] = "Invalid aspect ratio format"
-                return event_data
+                h = int(w * aspect_h / aspect_w)
+            except:
+                return {"success": False, "error": "Invalid aspect ratio format"}
+        if h:
+            video = video.crop(x=x, y=y, width=w, height=h)
+            final_resolution = {"width": w, "height": h}
 
-        if h is None:
-            event_data["error"] = "Height (h) is missing and no aspect ratio provided."
-            return event_data
+    # BAR + TEXT
+    if add_bar and final_resolution:
+        now = datetime.datetime.now().strftime("%d.%m.%y %H:%M:%S")
 
-        if x < 0 or y < 0 or w <= 0 or h <= 0:
-            event_data["error"] = "Invalid crop dimensions"
-            return event_data
+        # Balkenhöhe berechnen (in Pixeln)
+        try:
+            if isinstance(setting_bar_height, str) and "%" in setting_bar_height:
+                percent = float(setting_bar_height.strip("%")) / 100.0
+                bar_height_px = int(final_resolution["height"] * percent)
+            else:
+                bar_height_px = int(setting_bar_height)
+        except:
+            bar_height_px = 80
 
-        crop_filter = f"crop={w}:{h}:{x}:{y}"
-        filters.append(crop_filter)
-    
-    if add_bar:
-        bar_height = setting_bar_height if "%" not in setting_bar_height else "40"
-        font_size = setting_font_size if setting_font_size != "auto" else "24"
-        font_color = setting_font_color
-        bar_color = setting_bar_color
-        bar_position = setting_bar_position
-        text_filter = f"box=1: boxcolor={bar_color}@0.8: boxborderw={bar_height}"
-        filters.append(text_filter)
-        
-        
-    if filters:
-        command.extend(["-vf", ",".join(filters)])
+        # Bar-Y-Position
+        bar_y = final_resolution["height"] - bar_height_px if setting_bar_position == "bottom" else 0
+        text_y = f"({bar_height_px}-text_h)/2 + {bar_y}"
 
-    command.append(temp_video_path)
-    
-    event_data["ffmpeg_command"] = " ".join(command)
+        # Fontgröße
+        if setting_font_size == "auto":
+            setting_font_size = max(10, int(bar_height_px * 0.5))
+        else:
+            setting_font_size = int(setting_font_size)
 
-    process = await asyncio.create_subprocess_exec(
-    *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        # DRAWBOX
+        video = video.drawbox(
+            x=0,
+            y=bar_y,
+            width="iw",
+            height=bar_height_px,
+            color=f"{setting_bar_color}@0.6",
+            t="fill"
+        )
+
+        # DRAWTEXT – LINKS
+        video = video.drawtext(
+            text=custom_text_left,
+            x=10,
+            y=text_y,
+            fontsize=setting_font_size,
+            fontcolor=setting_font_color,
+            fontfile=setting_font_path
+        )
+
+        # DRAWTEXT – MITTE
+        video = video.drawtext(
+            text=custom_text_middle,
+            x="(w-text_w)/2",
+            y=text_y,
+            fontsize=setting_font_size,
+            fontcolor=setting_font_color,
+            fontfile=setting_font_path
+        )
+
+        # DRAWTEXT – RECHTS
+        video = video.drawtext(
+            text=custom_text_right or now,
+            x="w-text_w-10",
+            y=text_y,
+            fontsize=setting_font_size,
+            fontcolor=setting_font_color,
+            fontfile=setting_font_path
+        )
+
+    # OUTPUT
+    output_stream = ffmpeg.output(
+        video,
+        file_path,
+        t=duration,
+        vcodec="libx264",
+        acodec="aac",
+        crf=18,
+        preset="medium",
+        format="mp4"
     )
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        event_data["error"] = f"FFmpeg failed with error: {stderr.decode().strip()}"
-    return event_data
 
-    os.rename(temp_video_path, file_path)
+    try:
+        out, err = ffmpeg.run(output_stream, overwrite_output=True, capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        return {
+            "success": False,
+            "error": f"FFmpeg error: {e.stderr.decode('utf-8') if e.stderr else str(e)}"
+        }
 
-    probe_final = await hass.async_add_executor_job(lambda: subprocess.run(
-        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "json", file_path],
-        capture_output=True, text=True
-    ))
-
-    if probe_final.returncode == 0:
-        import json
-        metadata = json.loads(probe_final.stdout)
-        if "streams" in metadata and len(metadata["streams"]) > 0:
-            event_data["final_resolution"] = {
-                "width": metadata["streams"][0].get("width"),
-                "height": metadata["streams"][0].get("height")
-            }
-
+    # Backup
     if file_path_backup:
         try:
             os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
-            os.system(f"cp {file_path} {file_path_backup}")
-            event_data["backup_path"] = file_path_backup
+            os.system(f"cp '{file_path}' '{file_path_backup}'")
         except Exception as e:
-            event_data["error"] = f"Backup failed: {str(e)}"
-            event_data["success"] = False  
+            return {
+                "success": False,
+                "error": f"Backup failed: {str(e)}"
+            }
 
-    event_data["success"] = True
-    return event_data
-    
+    return {
+        "success": True,
+        "file_path": file_path,
+        "backup_path": file_path_backup,
+        "original_resolution": original_resolution,
+        "final_resolution": final_resolution
+    }
+
 def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: str,
                  custom_text_right: str, setting_font_path: str, setting_font_size,
                  setting_font_color: str, setting_bar_height,
