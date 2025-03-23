@@ -46,6 +46,10 @@
           "name": "Backup Save Path",
           "description": "Path where the backup of the image should be saved."
         },
+        "rotate_angle": {
+          "name": "rotate angle",
+          "description": "Optional rotate_angle (e.g., '180'). to rotate the snapshot"
+        },
         "crop": {
           "name": "Crop",
           "description": "Defines the cropping area as [x, y, width, height]. If an aspect ratio is set, height will be ignored."
@@ -53,10 +57,6 @@
         "crop_aspect_ratio": {
           "name": "Crop Aspect Ratio",
           "description": "Optional aspect ratio (e.g., '16:9'). If set, the height in 'crop' will be ignored and calculated automatically."
-        },
-        "rotate_angle": {
-          "name": "rotate angle",
-          "description": "Optional rotate_angle (e.g., '180'). to rotate the snapshot"
         },
         "add_bar": {
           "name": "Add Text Bar",
@@ -124,6 +124,10 @@
         "duration": {
           "name": "Duration",
           "description": "Duration of the video. max. 40 sec"
+        },
+        "rotate_angle": {
+          "name": "rotate angle",
+          "description": "Optional rotate_angle (e.g., '180'). to rotate the snapshot"
         },
         "crop": {
           "name": "Crop",

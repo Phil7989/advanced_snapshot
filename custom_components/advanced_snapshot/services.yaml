@@ -17,6 +17,10 @@ take_snapshot:
       example: "{{ now().strftime('%y%m%d')}}/{{ now().strftime('%H%M%S')}}_snapshot.jpg"
       selector:
         text:
+    rotate_angle: 
+      example: 10
+      selector:
+        text:
     crop:
       example: "[500, 100, 1066, 600]"
       required: false
@@ -24,10 +28,6 @@ take_snapshot:
         object:
     crop_aspect_ratio:
       example: "16:9"
-      selector:
-        text:
-    rotate_angle: 
-      example: 10
       selector:
         text:
     add_bar:
@@ -115,6 +115,10 @@ record_video:
     file_path_backup:
       required: false
       example: "{{ now().strftime('%y%m%d')}}/{{ now().strftime('%H%M%S')}}_video.mp4"
+      selector:
+        text:
+    rotate_angle: 
+      example: 10
       selector:
         text:
     crop:
