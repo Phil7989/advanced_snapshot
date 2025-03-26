@@ -6,6 +6,7 @@ import aiofiles
 import asyncio
 import datetime
 import math
+import codecs
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
@@ -254,12 +255,11 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         setting_font_path = os.path.join(font_folder, setting_font_path)
     if not os.path.splitext(setting_font_path)[1]:
         setting_font_path += ".ttf"
-
+    
     stream = await async_get_stream_source(hass, camera_entity_id)
     if not stream:
         return {"success": False, "error": "Camera stream could not be started"}
 
-    # Originalauflösung bestimmen
     try:
         probe = ffmpeg.probe(stream)
         video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
@@ -270,7 +270,12 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
     except Exception:
         original_resolution = None
 
-    stream_input = ffmpeg.input(stream)
+    stream_input = ffmpeg.input(
+    stream, 
+    rtsp_transport='tcp',
+    timeout='5000000',
+    max_delay='500000'
+    )
     video = stream_input.video
 
     if rotate_angle:
@@ -278,6 +283,9 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             video = video.filter('rotate', rotation_angle_rad, fillcolor='black')
             _LOGGER.info(f"Rotated image by {rotate_angle} degrees")
     
+    setting_font_color = sanitize_ffmpeg_color(setting_font_color)
+    setting_bar_color = sanitize_ffmpeg_color(setting_bar_color)
+
     # CROP
     if crop and len(crop) >= 3:
         x, y, w = crop[:3]
@@ -296,7 +304,6 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
     if add_bar and final_resolution:
         now = datetime.datetime.now().strftime("%d.%m.%y %H:%M:%S")
 
-        # Balkenhöhe berechnen (in Pixeln)
         try:
             if isinstance(setting_bar_height, str) and "%" in setting_bar_height:
                 percent = float(setting_bar_height.strip("%")) / 100.0
@@ -306,27 +313,27 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         except:
             bar_height_px = 80
 
-        # Bar-Y-Position
         bar_y = final_resolution["height"] - bar_height_px if setting_bar_position == "bottom" else 0
         text_y = f"({bar_height_px}-text_h)/2 + {bar_y}"
 
-        # Fontgröße
         if setting_font_size == "auto":
             setting_font_size = max(10, int(bar_height_px * 0.5))
         else:
             setting_font_size = int(setting_font_size)
-
-        # DRAWBOX
+        
+        custom_text_left = utf8_drawtext(custom_text_left)
+        custom_text_middle = utf8_drawtext(custom_text_middle)
+        custom_text_right = utf8_drawtext(custom_text_right)
+       
         video = video.drawbox(
             x=0,
             y=bar_y,
             width="iw",
             height=bar_height_px,
-            color=f"{setting_bar_color}@0.6",
+            color=f"{setting_bar_color}",
             t="fill"
         )
 
-        # DRAWTEXT – LINKS
         video = video.drawtext(
             text=custom_text_left,
             x=10,
@@ -336,7 +343,6 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             fontfile=setting_font_path
         )
 
-        # DRAWTEXT – MITTE
         video = video.drawtext(
             text=custom_text_middle,
             x="(w-text_w)/2",
@@ -346,9 +352,8 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             fontfile=setting_font_path
         )
 
-        # DRAWTEXT – RECHTS
         video = video.drawtext(
-            text=custom_text_right or now,
+            text=custom_text_right,
             x="w-text_w-10",
             y=text_y,
             fontsize=setting_font_size,
@@ -356,7 +361,6 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             fontfile=setting_font_path
         )
 
-    # OUTPUT
     output_stream = ffmpeg.output(
         video,
         file_path,
@@ -365,6 +369,8 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         acodec="aac",
         crf=18,
         preset="medium",
+        tune="film",          
+        pix_fmt="yuv420p",
         format="mp4"
     )
 
@@ -376,7 +382,6 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             "error": f"FFmpeg error: {e.stderr.decode('utf-8') if e.stderr else str(e)}"
         }
 
-    # Backup
     if file_path_backup:
         try:
             os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
@@ -395,7 +400,32 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         "final_resolution": final_resolution
     }
 
-def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: str,
+def sanitize_ffmpeg_color(color_str):
+    color_str = color_str.strip().lower()
+    if color_str.startswith("rgb(") and color_str.endswith(")"):
+        r, g, b = map(int, color_str[4:-1].split(","))
+        return f"0x{r:02X}{g:02X}{b:02X}"
+    return color_str  
+
+    
+def utf8_drawtext(text: str) -> str:
+    special_chars = {
+        "°": "\\u00B0C",
+        "ä": "\\u00E4",
+        "ö": "\\u00F6",
+        "ü": "\\u00FC",
+        "Ä": "\\u00C4",
+        "Ö": "\\u00D6",
+        "Ü": "\\u00DC",
+        "ß": "\\u00DF"
+    }
+
+    for char, unicode_escape in special_chars.items():
+        text = text.replace(char, unicode_escape)
+
+    return text.encode('utf-8').decode('unicode_escape')
+    
+def add_text_bar_old(img: Image.Image, custom_text_left: str, custom_text_middle: str,
                  custom_text_right: str, setting_font_path: str, setting_font_size,
                  setting_font_color: str, setting_bar_height,
                  setting_bar_color: str, setting_bar_position: str, event_data: dict) -> Image.Image:
@@ -445,6 +475,67 @@ def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: st
 
     return new_img
 
+def add_text_bar(img: Image.Image, custom_text_left: str, custom_text_middle: str,
+                 custom_text_right: str, setting_font_path: str, setting_font_size,
+                 setting_font_color: str, setting_bar_height,
+                 setting_bar_color: str, setting_bar_position: str, event_data: dict) -> Image.Image:
+
+    width, height = img.size
+
+    if isinstance(setting_bar_height, str) and setting_bar_height.endswith('%'):
+        try:
+            percentage = float(setting_bar_height.strip('%')) / 100.0
+            bar_height = int(height * percentage)
+        except ValueError:
+            _LOGGER.warning(f"Invalid percentage value for setting_bar_height: {setting_bar_height}. Using default 40px.")
+            event_data["error"] = f"Invalid percentage value: {setting_bar_height}. Using default 40px."
+            bar_height = 40
+    else:
+        try:
+            bar_height = int(setting_bar_height)
+        except ValueError:
+            _LOGGER.warning(f"Invalid pixel value for setting_bar_height: {setting_bar_height}. Using default 40px.")
+            event_data["error"] = f"Invalid pixel value: {setting_bar_height}. Using default 40px."
+            bar_height = 40
+
+    if setting_font_size == "auto":
+        setting_font_size = max(10, int(bar_height * 0.5))
+
+    draw = ImageDraw.Draw(img)
+
+    try:
+        font = ImageFont.truetype(setting_font_path, setting_font_size)
+    except IOError:
+        _LOGGER.warning(f"Font file not found: {setting_font_path}, using default font.")
+        event_data["error"] = f"Font file not found: {setting_font_path}, using default font."
+        font = ImageFont.load_default()
+
+    # Draw bar background
+    if setting_bar_position == "top":
+        bar_rect = (0, 0, width, bar_height)
+        text_y = (bar_height - setting_font_size) // 2
+    else:
+        bar_rect = (0, height - bar_height, width, height)
+        text_y = height - bar_height + (bar_height - setting_font_size) // 2
+
+    draw.rectangle(bar_rect, fill=setting_bar_color)
+
+    margin = 10
+
+    if custom_text_left:
+        draw.text((margin, text_y), custom_text_left, fill=setting_font_color, font=font)
+
+    if custom_text_middle:
+        text_middle_width = draw.textlength(custom_text_middle, font=font)
+        draw.text(((width - text_middle_width) // 2, text_y),
+                  custom_text_middle, fill=setting_font_color, font=font)
+
+    if custom_text_right:
+        text_right_width = draw.textlength(custom_text_right, font=font)
+        draw.text((width - text_right_width - margin, text_y),
+                  custom_text_right, fill=setting_font_color, font=font)
+
+    return img
 
 async def async_save_image(img: Image.Image, file_path: str):
     ext = os.path.splitext(file_path)[1].lower()
