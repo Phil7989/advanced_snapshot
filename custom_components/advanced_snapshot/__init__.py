@@ -375,7 +375,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
     )
 
     try:
-        out, err = ffmpeg.run(output_stream, overwrite_output=True, capture_stdout=True, capture_stderr=True)
+        out, err = ffmpeg.run_async(output_stream, overwrite_output=True)
     except ffmpeg.Error as e:
         return {
             "success": False,
