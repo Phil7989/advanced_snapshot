@@ -26,7 +26,7 @@ If you use this method, your component will always update to the latest version.
 
 ### Configuration
 
-Go to Configuration -> Integrations and click on "add integration". Then search for "advanced_snapshot".
+Go to Settings → Devices and Services and click on “+ ADD INTEGRATION”. Then search for “advanced_snapshot”.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=advanced_snapshot)
 
