@@ -92,7 +92,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Unloading Advanced Snapshot integration.")
     hass.services.async_remove(DOMAIN, "take_snapshot")
-    hass.services.asnyc_remove(DOMAIN, "handle_record_video")
+    hass.services.async_remove(DOMAIN, "handle_record_video")
     if DOMAIN in hass.data:
         del hass.data[DOMAIN]
     return True
