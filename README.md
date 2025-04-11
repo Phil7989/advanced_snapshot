@@ -45,7 +45,7 @@ service: advanced_snapshot.take_snapshot
 data:
   camera_entity_id: camera.your_camera_front_door
   file_path: frontdoor.jpg
-  file_path_backup: {{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.jpg
+  file_path_backup: "{{ now().strftime('%y%m%d')}}/{{now().strftime('%H%M%S')}}_frontdoor.jpg"
   crop: [100, 100, 400, 300]  # (x, y, width, height)
   crop_aspect_ratio: "16:9"
   rotate_angle: 90
