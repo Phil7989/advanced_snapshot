@@ -3,7 +3,7 @@
   "country": "DE",
   "homeassistant": "2025.3.6",
   "render_readme": true,
-  "zip_release": true,
+  "zip_release": false,
   "filename": "advanced_snapshot-2025.3.6.zip",
   "render_readme": true
 }
