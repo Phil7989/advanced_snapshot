@@ -257,12 +257,12 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         setting_font_path += ".ttf"
     
     try:
-    stream = await async_get_stream_source(hass, camera_entity_id)
-    if not stream:
-        _LOGGER.error(f"No stream URL returned for camera {camera_entity_id}")
-        return {"success": False, "error": f"Could not get stream URL for camera {camera_entity_id}. Check camera settings or integration."}
+        stream = await async_get_stream_source(hass, camera_entity_id)
+        if not stream:
+            _LOGGER.error(f"No stream URL returned for camera {camera_entity_id}")
+            return {"success": False, "error": f"Could not get stream URL for camera {camera_entity_id}. Check camera settings or integration."}
     except Exception as e:
-    _LOGGER.exception(f"Error getting stream source for {camera_entity_id}: {str(e)}")
+        _LOGGER.exception(f"Error getting stream source for {camera_entity_id}: {str(e)}")
         return {"success": False, "error": f"Exception when getting stream: {str(e)}"}
 
     try:
