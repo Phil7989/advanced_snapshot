@@ -127,6 +127,7 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
         custom_text_middle = call.data.get("custom_text_middle", "")
         custom_text_right = call.data.get("custom_text_right", "")
         setting_font_size = call.data.get("setting_font_size")
+        setting_font_color = call.data.get("setting_font_color", "black")
         setting_bar_height = call.data.get("setting_bar_height")
         setting_bar_color = call.data.get("setting_bar_color", "white")
         setting_bar_position = call.data.get("setting_bar_position", "bottom")
@@ -193,7 +194,7 @@ async def handle_take_snapshot(hass: HomeAssistant, call: ServiceCall) -> Servic
             _LOGGER.debug("Adding text bar to image.")
             img = add_text_bar(
                 img, custom_text_left, custom_text_middle, custom_text_right,
-                setting_font_path, setting_font_size, "black",
+                setting_font_path, setting_font_size, setting_font_color,
                 setting_bar_height, setting_bar_color, setting_bar_position, event_data
             )
 
