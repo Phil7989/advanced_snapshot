@@ -16,7 +16,7 @@
 
 ## 🔧 Installation - Using HACS
 
-This integration is NO official HACS Integration right now.
+This integration is an official HACS Integration right now.
 
 Open HACS then install the "advanced_snapshot" integration or use the link below.
 
