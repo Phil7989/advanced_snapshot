@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/Phil7989/advanced_snapshot/issues",
   "requirements": ["Pillow", "ffmpeg-python"],
   "single_config_entry": true,
-  "version": "2026.01.08-beta.1"
+  "version": "2026.1.8"
 }
