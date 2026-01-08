@@ -1,6 +1,6 @@
 {
     "services": {
         "take_snapshot": "mdi:camera",
-        "record_video": "mdi:video",
+        "record_video": "mdi:video"
     }
 }
