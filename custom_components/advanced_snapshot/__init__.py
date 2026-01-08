@@ -375,7 +375,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         format="mp4"
     )
 
-        try:
+    try:
         process = ffmpeg.run_async(
             output_stream,
             overwrite_output=True,
