@@ -375,18 +375,37 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         format="mp4"
     )
 
-    try:
-        out, err = ffmpeg.run_async(output_stream, overwrite_output=True)
-    except ffmpeg.Error as e:
+        try:
+        process = ffmpeg.run_async(
+            output_stream,
+            overwrite_output=True,
+            pipe_stderr=True,
+            pipe_stdout=True,  # optional, aber ok für communicate()
+        )
+    
+        # communicate() blockt -> daher in den Executor
+        stdout, stderr = await hass.async_add_executor_job(process.communicate)
+    
+        if process.returncode != 0:
+            err_txt = (stderr or b"").decode("utf-8", errors="ignore")
+            return {
+                "success": False,
+                "error": f"FFmpeg failed (rc={process.returncode}): {err_txt}"
+            }
+
+    except Exception as e:
         return {
             "success": False,
-            "error": f"FFmpeg error: {e.stderr.decode('utf-8') if e.stderr else str(e)}"
+            "error": f"FFmpeg start error: {str(e)}"
         }
 
     if file_path_backup:
         try:
             os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
-            os.system(f"cp '{file_path}' '{file_path_backup}'")
+
+            # nicht über shell cp, sondern sauber kopieren (auch im Executor)
+            await hass.async_add_executor_job(shutil.copy2, file_path, file_path_backup)
+
         except Exception as e:
             return {
                 "success": False,
@@ -400,6 +419,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         "original_resolution": original_resolution,
         "final_resolution": final_resolution
     }
+
 
 def sanitize_ffmpeg_color(color_str):
     color_str = color_str.strip().lower()
