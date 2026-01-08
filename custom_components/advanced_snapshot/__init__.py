@@ -7,6 +7,7 @@ import asyncio
 import datetime
 import math
 import codecs
+import shutil
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
