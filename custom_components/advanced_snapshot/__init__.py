@@ -400,6 +400,11 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             "error": f"FFmpeg execution error: {e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e)}"
         }
     except OSError as e:
+        _LOGGER.error(f"OS error during FFmpeg execution: {str(e)}")
+        return {
+            "success": False,
+            "error": f"OS error during FFmpeg execution: {str(e)}"
+        }
 
     if file_path_backup:
         try:
