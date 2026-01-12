@@ -394,17 +394,18 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
                 "error": f"FFmpeg failed (rc={process.returncode}): {err_txt}"
             }
 
-    except OSError as e:
+    except ffmpeg.Error as e:
         return {
             "success": False,
-            "error": f"FFmpeg start error: {str(e)}"
+            "error": f"FFmpeg execution error: {e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e)}"
         }
+    except OSError as e:
 
     if file_path_backup:
         try:
             await hass.async_add_executor_job(os.makedirs, os.path.dirname(file_path_backup), exist_ok=True)
 
-            # nicht über shell cp, sondern sauber kopieren (auch im Executor)
+            # Use shutil.copy2 for a cleaner copy operation (also in the Executor)
             await hass.async_add_executor_job(shutil.copy2, file_path, file_path_backup)
 
         except Exception as e:
