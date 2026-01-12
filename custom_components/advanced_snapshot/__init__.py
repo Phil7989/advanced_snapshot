@@ -252,7 +252,8 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
 
     if file_path_backup and not os.path.isabs(file_path_backup):
         file_path_backup = os.path.join(backup_folder, file_path_backup)
-
+        backup_dir = os.path.dirname(file_path_backup)
+        
     if not os.path.isabs(setting_font_path):
         setting_font_path = os.path.join(font_folder, setting_font_path)
     if not os.path.splitext(setting_font_path)[1]:
@@ -410,7 +411,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
 
     if file_path_backup:
         try:
-            await hass.async_add_executor_job(os.makedirs, os.path.dirname(file_path_backup))
+            await hass.async_add_executor_job(os.makedirs, os.path.dirname(backup_dir))
 
             # Use shutil.copy2 for a cleaner copy operation (also in the Executor)
             await hass.async_add_executor_job(shutil.copy2, file_path, file_path_backup)
