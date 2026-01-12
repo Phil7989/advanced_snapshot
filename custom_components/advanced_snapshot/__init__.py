@@ -381,10 +381,10 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             output_stream,
             overwrite_output=True,
             pipe_stderr=True,
-            pipe_stdout=True,  # optional, aber ok für communicate()
+            pipe_stdout=True,
         )
     
-        # communicate() blockt -> daher in den Executor
+        # communicate() is a blocking call, so it's run in an executor
         stdout, stderr = await hass.async_add_executor_job(process.communicate)
     
         if process.returncode != 0:
