@@ -402,7 +402,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
 
     if file_path_backup:
         try:
-            os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
+            await hass.async_add_executor_job(os.makedirs, os.path.dirname(file_path_backup), exist_ok=True)
 
             # nicht über shell cp, sondern sauber kopieren (auch im Executor)
             await hass.async_add_executor_job(shutil.copy2, file_path, file_path_backup)
