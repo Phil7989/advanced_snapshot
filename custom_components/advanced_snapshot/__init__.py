@@ -269,8 +269,10 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
             "width": int(video_stream["width"]),
             "height": int(video_stream["height"])
         }
+        final_resolution = original_resolution
     except Exception:
         original_resolution = None
+        final_resolution = None
 
     stream_input = ffmpeg.input(
     stream, 
