@@ -394,7 +394,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
                 "error": f"FFmpeg failed (rc={process.returncode}): {err_txt}"
             }
 
-    except Exception as e:
+    except OSError as e:
         return {
             "success": False,
             "error": f"FFmpeg start error: {str(e)}"
