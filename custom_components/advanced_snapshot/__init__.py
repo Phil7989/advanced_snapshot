@@ -7,6 +7,7 @@ import asyncio
 import datetime
 import math
 import codecs
+import shutil
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.components.camera import async_get_image
@@ -376,17 +377,42 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
     )
 
     try:
-        out, err = ffmpeg.run_async(output_stream, overwrite_output=True)
+        process = ffmpeg.run_async(
+            output_stream,
+            overwrite_output=True,
+            pipe_stderr=True,
+            pipe_stdout=True,
+        )
+    
+        # communicate() is a blocking call, so it's run in an executor
+        stdout, stderr = await hass.async_add_executor_job(process.communicate)
+    
+        if process.returncode != 0:
+            err_txt = (stderr or b"").decode("utf-8", errors="ignore")
+            return {
+                "success": False,
+                "error": f"FFmpeg failed (rc={process.returncode}): {err_txt}"
+            }
+
     except ffmpeg.Error as e:
         return {
             "success": False,
-            "error": f"FFmpeg error: {e.stderr.decode('utf-8') if e.stderr else str(e)}"
+            "error": f"FFmpeg execution error: {e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e)}"
+        }
+    except OSError as e:
+        _LOGGER.error(f"OS error during FFmpeg execution: {str(e)}")
+        return {
+            "success": False,
+            "error": f"OS error during FFmpeg execution: {str(e)}"
         }
 
     if file_path_backup:
         try:
-            os.makedirs(os.path.dirname(file_path_backup), exist_ok=True)
-            os.system(f"cp '{file_path}' '{file_path_backup}'")
+            await hass.async_add_executor_job(os.makedirs, os.path.dirname(file_path_backup), exist_ok=True)
+
+            # Use shutil.copy2 for a cleaner copy operation (also in the Executor)
+            await hass.async_add_executor_job(shutil.copy2, file_path, file_path_backup)
+
         except Exception as e:
             return {
                 "success": False,
@@ -400,6 +426,7 @@ async def handle_record_video(hass: HomeAssistant, call: ServiceCall) -> Service
         "original_resolution": original_resolution,
         "final_resolution": final_resolution
     }
+
 
 def sanitize_ffmpeg_color(color_str):
     color_str = color_str.strip().lower()
